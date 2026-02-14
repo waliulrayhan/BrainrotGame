@@ -128,7 +128,7 @@ Click on MainHUD and set these properties:
 | **Size** | `{1, -10},{1, -10}` |
 | **Position** | `{0, 5},{0, 5}` |
 | **BackgroundTransparency** | 1 |
-| **Text** | `💰 $0` |
+| **Text** | `Balance: $0` |
 | **TextColor3** | RGB(50, 25, 0) - Dark brown |
 | **TextSize** | 32 |
 | **Font** | GothamBold |
@@ -197,7 +197,7 @@ Click on MainHUD and set these properties:
 | **Size** | `{1, -10},{1, -10}` |
 | **Position** | `{0, 5},{0, 5}` |
 | **BackgroundTransparency** | 1 |
-| **Text** | `⏰ $0` |
+| **Text** | `Unclaimed: $0` |
 | **TextColor3** | RGB(0, 50, 25) - Dark green |
 | **TextSize** | 32 |
 | **Font** | GothamBold |

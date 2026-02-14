@@ -39,9 +39,16 @@ end
 
 -- Handle purchase request from client
 function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
-	-- Validate character model exists
-	if not characterModel or not characterModel:IsA("Model") then
-		warn("[PurchaseService] Invalid character model from", player.Name)
+	-- Validate character model exists AND is still in workspace (not already bought)
+	if not characterModel or not characterModel:IsA("Model") or not characterModel.Parent then
+		warn("[PurchaseService] Invalid or already purchased character from", player.Name)
+		PurchaseFeedbackEvent:FireClient(player, "error", "Character no longer available!")
+		return
+	end
+
+	-- Verify it's in the workspace (anti-exploit: prevent purchasing already-owned characters)
+	if characterModel.Parent ~= workspace then
+		warn("[PurchaseService] Character not in workspace from", player.Name)
 		return
 	end
 
@@ -82,9 +89,14 @@ function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
 		return
 	end
 
+	-- Mark character as sold immediately (prevent double-purchase race condition)
+	characterModel.Parent = nil -- Remove from workspace immediately
+
 	-- Deduct money
 	local success = CurrencyService.DeductBalance(player, characterData.price)
 	if not success then
+		-- Refund by destroying the character (shouldn't happen, but safety check)
+		characterModel:Destroy()
 		PurchaseFeedbackEvent:FireClient(player, "error", "Purchase failed!")
 		return
 	end
@@ -95,10 +107,8 @@ function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
 	-- Deliver character to base
 	PurchaseService.DeliverToBase(player, characterData)
 
-	-- Remove the character from lane
-	if characterModel then
-		characterModel:Destroy()
-	end
+	-- Destroy the character model (it's been cloned for delivery if needed)
+	characterModel:Destroy()
 
 	-- Send success feedback
 	PurchaseFeedbackEvent:FireClient(player, "success", "Bought " .. characterData.name .. "!")
@@ -132,6 +142,8 @@ function PurchaseService.IsPlayerInPurchaseZone(player: Player): boolean
 end
 
 -- Deliver purchased character to player's base
+-- Note: Uses instant delivery (no movement) to avoid Tween.Completed reliability issues
+-- Character immediately starts earning upon purchase (simplified gameplay)
 function PurchaseService.DeliverToBase(player: Player, characterData)
 	local base = BaseService.GetPlayerBase(player)
 
@@ -140,11 +152,11 @@ function PurchaseService.DeliverToBase(player: Player, characterData)
 		return
 	end
 
-	-- Add to earning system
+	-- Add to earning system immediately (no movement delay)
 	BaseService.AddEarner(player, characterData)
 
-	-- Create visual representation at base (optional)
-	-- Parent to the base's parent (Bases folder) instead of workspace
+	-- Create visual representation at base (instant spawn)
+	-- Parent to the base's parent (Bases folder) to avoid workspace lock issues
 	local visualModel = Instance.new("Model")
 	visualModel.Name = characterData.name
 
@@ -155,7 +167,7 @@ function PurchaseService.DeliverToBase(player: Player, characterData)
 	part.Anchored = true
 	part.CanCollide = false
 
-	-- Random position on base
+	-- Random position on base (aesthetic variation)
 	local random = Random.new()
 	local baseSize = base.Size
 	local offsetX = random:NextNumber(-baseSize.X / 3, baseSize.X / 3)

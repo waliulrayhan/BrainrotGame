@@ -11,6 +11,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CurrencyService = {}
 
+-- Constants (prevent exploits and float drift)
+local MAX_CURRENCY = 1e15 -- 1 quadrillion maximum
+local MIN_CURRENCY = 0
+
+-- Helper: Clamp and round to integer (prevents float drift and absurd values)
+local function ClampCurrency(value: number): number
+	value = math.floor(value + 0.5) -- Round to nearest integer
+	return math.clamp(value, MIN_CURRENCY, MAX_CURRENCY)
+end
+
 -- Store player money data
 local PlayerData = {}
 
@@ -29,8 +39,8 @@ end
 -- Initialize player currency
 function CurrencyService.InitPlayer(player: Player, savedBalance: number?, savedUnclaimed: number?)
 	PlayerData[player.UserId] = {
-		Balance = savedBalance or 50, -- Starting balance
-		Unclaimed = savedUnclaimed or 0,
+		Balance = ClampCurrency(savedBalance or 50), -- Starting balance
+		Unclaimed = ClampCurrency(savedUnclaimed or 0),
 	}
 
 	-- Send initial state to client
@@ -46,7 +56,8 @@ function CurrencyService.AddBalance(player: Player, amount: number)
 		return
 	end
 
-	PlayerData[player.UserId].Balance += amount
+	amount = ClampCurrency(amount)
+	PlayerData[player.UserId].Balance = ClampCurrency(PlayerData[player.UserId].Balance + amount)
 	CurrencyService.SyncPlayer(player)
 end
 
@@ -57,11 +68,12 @@ function CurrencyService.DeductBalance(player: Player, amount: number): boolean
 		return false
 	end
 
+	amount = ClampCurrency(amount)
 	if PlayerData[player.UserId].Balance < amount then
 		return false -- Not enough money
 	end
 
-	PlayerData[player.UserId].Balance -= amount
+	PlayerData[player.UserId].Balance = ClampCurrency(PlayerData[player.UserId].Balance - amount)
 	CurrencyService.SyncPlayer(player)
 	return true
 end
@@ -72,7 +84,8 @@ function CurrencyService.AddUnclaimed(player: Player, amount: number)
 		return
 	end
 
-	PlayerData[player.UserId].Unclaimed += amount
+	amount = ClampCurrency(amount)
+	PlayerData[player.UserId].Unclaimed = ClampCurrency(PlayerData[player.UserId].Unclaimed + amount)
 	CurrencyService.SyncPlayer(player)
 end
 
@@ -85,7 +98,7 @@ function CurrencyService.ClaimMoney(player: Player): number
 	local unclaimed = PlayerData[player.UserId].Unclaimed
 
 	if unclaimed > 0 then
-		PlayerData[player.UserId].Balance += unclaimed
+		PlayerData[player.UserId].Balance = ClampCurrency(PlayerData[player.UserId].Balance + unclaimed)
 		PlayerData[player.UserId].Unclaimed = 0
 		CurrencyService.SyncPlayer(player)
 
