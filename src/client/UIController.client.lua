@@ -21,17 +21,14 @@ local PurchaseFeedbackEvent = ReplicatedStorage:WaitForChild("Shared")
 	:WaitForChild("Remotes")
 	:WaitForChild("PurchaseFeedback")
 
--- UI Elements
-local mainHud = playerGui:WaitForChild("MainHUD", 5) -- Wait max 5 seconds
-local topBar = mainHud and mainHud:WaitForChild("TopBar", 5)
-local balanceLabel = topBar and topBar:WaitForChild("BalanceLabel", 5)
-local unclaimedLabel = topBar and topBar:WaitForChild("UnclaimedLabel", 5)
-local claimSection = mainHud and mainHud:WaitForChild("ClaimSection", 5)
-local claimButton = claimSection and claimSection:WaitForChild("ClaimButton", 5)
-local notifications = mainHud and mainHud:WaitForChild("Notifications", 5)
-
--- Check if UI exists
-local UI_EXISTS = mainHud ~= nil and balanceLabel ~= nil
+-- UI Elements (wait longer for UI to be created)
+local mainHud = playerGui:WaitForChild("MainHUD", 30) -- Wait up to 30 seconds
+local topBar = mainHud and mainHud:WaitForChild("TopBar", 10)
+local balanceLabel = topBar and topBar:WaitForChild("BalanceLabel", 10)
+local unclaimedLabel = topBar and topBar:WaitForChild("UnclaimedLabel", 10)
+local claimSection = mainHud and mainHud:WaitForChild("ClaimSection", 10)
+local claimButton = claimSection and claimSection:WaitForChild("ClaimButton", 10)
+local notifications = mainHud and mainHud:WaitForChild("Notifications", 10)
 
 -- Current values for animation
 local currentBalance = 0
@@ -44,7 +41,7 @@ local UIController = {}
 -- Update UI values with animation
 function UIController.StartUpdateLoop()
 	-- Skip if UI doesn't exist yet
-	if not UI_EXISTS then
+	if not mainHud or not balanceLabel then
 		print("[UIController] UI not found - create MainHUD in StarterGui!")
 		return
 	end
@@ -84,7 +81,7 @@ end
 
 -- Handle claim button click
 function UIController.OnClaimClicked()
-	if not UI_EXISTS then return end
+	if not claimButton then return end
 	
 	if currentUnclaimed > 0 then
 		RequestClaimEvent:FireServer()
@@ -117,7 +114,8 @@ end
 
 -- Show toast notification
 function UIController.ShowToast(type: string, message: string)
-	if not UI_EXISTS or not notifications then 
+	-- Check if notifications frame exists NOW, not at script start
+	if not notifications then 
 		print("[Toast]", type, "-", message)
 		return 
 	end
@@ -192,7 +190,7 @@ end
 
 -- Initialize controller
 function UIController.Initialize()
-	if not UI_EXISTS then
+	if not mainHud or not claimButton then
 		print("[UIController] UI not created yet - characters will still spawn!")
 		print("[UIController] Create MainHUD in StarterGui to see the UI")
 		-- Still setup character clicking even without UI
@@ -218,9 +216,28 @@ end
 StateUpdateEvent.OnClientEvent:Connect(function(data)
 	if data.Balance then
 		currentBalance = data.Balance
+		-- Update label directly if it exists
+		if balanceLabel then
+			balanceLabel.Text = "💰 " .. UIConfig.FormatMoney(data.Balance)
+		end
 	end
 	if data.Unclaimed then
 		currentUnclaimed = data.Unclaimed
+		-- Update label directly if it exists
+		if unclaimedLabel then
+			unclaimedLabel.Text = "⏰ " .. UIConfig.FormatMoney(data.Unclaimed)
+		end
+		
+		-- Update claim button if it exists
+		if claimButton then
+			if data.Unclaimed > 0 then
+				claimButton.BackgroundColor3 = UIConfig.Colors.Magenta
+				claimButton.Text = "🎁 CLAIM " .. UIConfig.FormatMoney(data.Unclaimed) .. "! 🎁"
+			else
+				claimButton.BackgroundColor3 = UIConfig.Colors.Secondary
+				claimButton.Text = "🎁 CLAIM! 🎁"
+			end
+		end
 	end
 end)
 

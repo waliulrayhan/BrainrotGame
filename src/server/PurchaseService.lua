@@ -96,8 +96,8 @@ function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
 	PurchaseService.DeliverToBase(player, characterData)
 
 	-- Remove the character from lane
-	if characterModel.Parent then
-		characterModel.Parent:Destroy()
+	if characterModel then
+		characterModel:Destroy()
 	end
 
 	-- Send success feedback
