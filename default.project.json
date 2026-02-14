@@ -1,0 +1,48 @@
+{
+  "name": "BrainrotGame",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$className": "Folder",
+        "Config": {
+          "$path": "src/shared/Config"
+        },
+        "Remotes": {
+          "$className": "Folder",
+          "StateUpdate": {
+            "$className": "RemoteEvent"
+          },
+          "RequestBuy": {
+            "$className": "RemoteEvent"
+          },
+          "RequestClaim": {
+            "$className": "RemoteEvent"
+          },
+          "PurchaseFeedback": {
+            "$className": "RemoteEvent"
+          }
+        }
+      }
+    },
+    "ServerScriptService": {
+      "Services": {
+        "$className": "Folder",
+        "$path": "src/server"
+      },
+      "MainServer": {
+        "$path": "src/MainServer.server.lua"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$className": "Folder",
+          "UIController": {
+            "$path": "src/client/UIController.client.lua"
+          }
+        }
+      }
+    }
+  }
+}

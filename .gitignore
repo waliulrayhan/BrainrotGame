@@ -1,0 +1,18 @@
+﻿# Roblox
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+
+# Rojo
+build/
+
+# Wally
+Packages/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
