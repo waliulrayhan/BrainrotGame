@@ -45,7 +45,7 @@ function BasePadService.GetBasePad(tier: number): Part?
 end
 
 -- Add a character to a tier's basepad
-function BasePadService.AddCharacter(tier: number, characterData, player: Player)
+function BasePadService.AddCharacter(tier: number, characterData, player: Player, existingModel)
 	if not BasePads[tier] then
 		warn("[BasePadService] No basepad found for tier", tier)
 		return nil
@@ -55,8 +55,8 @@ function BasePadService.AddCharacter(tier: number, characterData, player: Player
 		BasePadCharacters[tier] = {}
 	end
 
-	-- Create character model on the basepad
-	local characterModel = BasePadService.CreateCharacterModel(characterData, tier, player)
+	-- Create or move character model to the basepad
+	local characterModel = BasePadService.CreateOrMoveCharacterModel(characterData, tier, player, existingModel)
 
 	-- Store character data
 	table.insert(BasePadCharacters[tier], {
@@ -78,22 +78,54 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 		return nil
 	end
 
-	-- Create the character model
-	local model = Instance.new("Model")
+	-- Get the character model template from ReplicatedStorage
+	local characterModelsFolder = ReplicatedStorage:FindFirstChild("CharacterModels")
+	if not characterModelsFolder then
+		warn("[BasePadService] CharacterModels folder not found in ReplicatedStorage!")
+		return nil
+	end
+
+	local template = characterModelsFolder:FindFirstChild(characterData.modelKey)
+	if not template then
+		warn("[BasePadService] Model not found:", characterData.modelKey)
+		return nil
+	end
+
+	-- Clone the model
+	local model = template:Clone()
 	model.Name = characterData.name .. "_" .. player.Name
 
-	local part = Instance.new("Part")
-	part.Name = "Character"
-	part.Size = characterData.size
-	part.Color = characterData.color
-	part.Material = Enum.Material.Neon
-	part.Anchored = true
-	part.CanCollide = false
-	part.Parent = model
+	-- Find humanoid and set properties
+	local humanoid = model:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		humanoid.HealthDisplayDistance = 0
+		humanoid.NameDisplayDistance = 0
+	end
+
+	-- Make sure we have a PrimaryPart
+	local rootPart = model:FindFirstChild("HumanoidRootPart")
+	if rootPart then
+		model.PrimaryPart = rootPart
+	end
+
+	-- Only anchor the primary part
+	if model.PrimaryPart then
+		model.PrimaryPart.Anchored = true
+	end
+
+	-- Disable collision for all parts
+	for _, part in pairs(model:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = false
+		end
+	end
 
 	-- Position on the basepad - arrange characters in a grid
 	local position = BasePadService.GetNextCharacterPosition(tier, basePad)
-	part.Position = position
+	if model.PrimaryPart then
+		model:SetPrimaryPartCFrame(CFrame.new(position))
+	end
 
 	-- Store owner and character data
 	local ownerValue = Instance.new("StringValue")
@@ -112,45 +144,148 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 	idValue.Parent = model
 
 	-- Add a name tag
-	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.new(0, 150, 0, 50)
-	billboard.StudsOffset = Vector3.new(0, characterData.size.Y / 2 + 1, 0)
-	billboard.AlwaysOnTop = true
-	billboard.Parent = part
+	local head = model:FindFirstChild("Head")
+	if head then
+		local billboard = Instance.new("BillboardGui")
+		billboard.Size = UDim2.new(0, 150, 0, 50)
+		billboard.StudsOffset = Vector3.new(0, 3, 0)
+		billboard.AlwaysOnTop = true
+		billboard.Parent = head
 
-	local frame = Instance.new("Frame")
-	frame.Size = UDim2.new(1, 0, 1, 0)
-	frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	frame.BackgroundTransparency = 0.5
-	frame.BorderSizePixel = 0
-	frame.Parent = billboard
+		local frame = Instance.new("Frame")
+		frame.Size = UDim2.new(1, 0, 1, 0)
+		frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		frame.BackgroundTransparency = 0.5
+		frame.BorderSizePixel = 0
+		frame.Parent = billboard
 
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 8)
-	corner.Parent = frame
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0, 8)
+		corner.Parent = frame
 
-	local nameLabel = Instance.new("TextLabel")
-	nameLabel.Size = UDim2.new(1, -10, 0.5, 0)
-	nameLabel.Position = UDim2.new(0, 5, 0, 0)
-	nameLabel.BackgroundTransparency = 1
-	nameLabel.Text = characterData.name
-	nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	nameLabel.TextScaled = true
-	nameLabel.Font = Enum.Font.GothamBold
-	nameLabel.Parent = frame
+		local nameLabel = Instance.new("TextLabel")
+		nameLabel.Size = UDim2.new(1, -10, 0.5, 0)
+		nameLabel.Position = UDim2.new(0, 5, 0, 0)
+		nameLabel.BackgroundTransparency = 1
+		nameLabel.Text = characterData.name
+		nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		nameLabel.TextScaled = true
+		nameLabel.Font = Enum.Font.GothamBold
+		nameLabel.Parent = frame
 
-	local epsLabel = Instance.new("TextLabel")
-	epsLabel.Size = UDim2.new(1, -10, 0.5, 0)
-	epsLabel.Position = UDim2.new(0, 5, 0.5, 0)
-	epsLabel.BackgroundTransparency = 1
-	epsLabel.Text = "$" .. characterData.earningsPerSecond .. "/s"
-	epsLabel.TextColor3 = Color3.fromRGB(0, 255, 127)
-	epsLabel.TextScaled = true
-	epsLabel.Font = Enum.Font.Gotham
-	epsLabel.Parent = frame
+		local epsLabel = Instance.new("TextLabel")
+		epsLabel.Size = UDim2.new(1, -10, 0.5, 0)
+		epsLabel.Position = UDim2.new(0, 5, 0.5, 0)
+		epsLabel.BackgroundTransparency = 1
+		epsLabel.Text = "$" .. characterData.earningsPerSecond .. "/s"
+		epsLabel.TextColor3 = Color3.fromRGB(0, 255, 127)
+		epsLabel.TextScaled = true
+		epsLabel.Font = Enum.Font.Gotham
+		epsLabel.Parent = frame
+	end
 
 	model.Parent = workspace
 	return model
+end
+
+-- Create or move a character model to the basepad
+function BasePadService.CreateOrMoveCharacterModel(characterData, tier: number, player: Player, existingModel)
+	local basePad = BasePads[tier]
+	if not basePad then
+		return nil
+	end
+
+	-- Get the target position on the basepad
+	local targetPosition = BasePadService.GetNextCharacterPosition(tier, basePad)
+
+	-- If we have an existing model from the shop lane, move it
+	if existingModel then
+		-- Mark as purchased to stop shop lane movement
+		local purchasedFlag = Instance.new("BoolValue")
+		purchasedFlag.Name = "Purchased"
+		purchasedFlag.Value = true
+		purchasedFlag.Parent = existingModel
+		
+		-- Update model name
+		existingModel.Name = characterData.name .. "_" .. player.Name
+		
+		-- Find the root part and ensure PrimaryPart is set
+		local rootPart = existingModel:FindFirstChild("HumanoidRootPart")
+		if not rootPart then
+			rootPart = existingModel.PrimaryPart
+		end
+		
+		if rootPart then
+			-- Ensure the model has a PrimaryPart set
+			if not existingModel.PrimaryPart then
+				existingModel.PrimaryPart = rootPart
+			end
+			
+			-- Remove click detector (no longer needed)
+			local clickDetector = rootPart:FindFirstChild("ClickDetector")
+			if clickDetector then
+				clickDetector:Destroy()
+			end
+			
+			-- Only anchor the primary part
+			rootPart.Anchored = true
+			
+			-- Tween the entire character model to the basepad using SetPrimaryPartCFrame
+			local startTime = tick()
+			local startCFrame = rootPart.CFrame
+			local targetCFrame = CFrame.new(targetPosition)
+			local duration = 1.5
+			
+			print("[BasePadService] Moving", characterData.name, "to basepad. Start:", startCFrame.Position, "End:", targetPosition)
+			
+			local connection
+			connection = game:GetService("RunService").Heartbeat:Connect(function()
+				if not existingModel or not existingModel.Parent or not existingModel.PrimaryPart then
+					if connection then connection:Disconnect() end
+					print("[BasePadService] Movement stopped - model or parts missing")
+					return
+				end
+				
+				local elapsed = tick() - startTime
+				local alpha = math.min(elapsed / duration, 1)
+				-- Use quad easing out
+				local easedAlpha = 1 - (1 - alpha) * (1 - alpha)
+				
+				local currentCFrame = startCFrame:Lerp(targetCFrame, easedAlpha)
+				existingModel:SetPrimaryPartCFrame(currentCFrame)
+				
+				if alpha >= 1 then
+					print("[BasePadService] Movement complete for", characterData.name)
+					connection:Disconnect()
+				end
+			end)
+		else
+			warn("[BasePadService] No HumanoidRootPart or PrimaryPart found in purchased character!")
+		end
+		
+		-- Add or update owner value
+		local ownerValue = existingModel:FindFirstChild("Owner")
+		if not ownerValue then
+			ownerValue = Instance.new("StringValue")
+			ownerValue.Name = "Owner"
+			ownerValue.Parent = existingModel
+		end
+		ownerValue.Value = player.Name
+
+		-- Add or update tier value
+		local tierValue = existingModel:FindFirstChild("Tier")
+		if not tierValue then
+			tierValue = Instance.new("IntValue")
+			tierValue.Name = "Tier"
+			tierValue.Parent = existingModel
+		end
+		tierValue.Value = tier
+
+		return existingModel
+	else
+		-- Create a new character model (for loading saved data)
+		return BasePadService.CreateCharacterModel(characterData, tier, player)
+	end
 end
 
 -- Get the next position for a character on a basepad (grid layout)

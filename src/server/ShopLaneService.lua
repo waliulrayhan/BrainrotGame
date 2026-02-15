@@ -5,7 +5,6 @@
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 
 local CharacterConfig = require(ReplicatedStorage.Shared.Config.CharacterConfig)
 local UIConfig = require(ReplicatedStorage.Shared.Config.UIConfig)
@@ -61,45 +60,92 @@ function ShopLaneService.SpawnCharacter()
 	local startX = lanePosition.X - (laneSize.X / 2)
 	local endX = lanePosition.X + (laneSize.X / 2)
 
-	characterModel.Position = Vector3.new(startX, lanePosition.Y + 3, lanePosition.Z)
+	-- Position the character model
+	local startPosition = Vector3.new(startX, lanePosition.Y + 3, lanePosition.Z)
+	if characterModel.PrimaryPart then
+		characterModel:SetPrimaryPartCFrame(CFrame.new(startPosition))
+	else
+		warn("[ShopLaneService] No PrimaryPart found for character")
+		return
+	end
 
-	-- Tween across the lane
-	local tweenInfo = TweenInfo.new(
-		MoveDuration,
-		Enum.EasingStyle.Linear,
-		Enum.EasingDirection.InOut,
-		0,
-		false,
-		0
-	)
+	-- Tween across the lane using SetPrimaryPartCFrame in a loop for smooth movement
+	local startTime = tick()
+	local connection
+	connection = game:GetService("RunService").Heartbeat:Connect(function()
+		-- Check if character was purchased (stop movement)
+		if characterModel:FindFirstChild("Purchased") then
+			if connection then connection:Disconnect() end
+			return
+		end
+		
+		if not characterModel or not characterModel.Parent or not characterModel.PrimaryPart then
+			if connection then connection:Disconnect() end
+			return
+		end
 
-	local goal = { Position = Vector3.new(endX, lanePosition.Y + 3, lanePosition.Z) }
-	local tween = TweenService:Create(characterModel, tweenInfo, goal)
-
-	tween:Play()
-
-	-- Cleanup when tween completes
-	tween.Completed:Connect(function()
-		if characterModel and characterModel.Parent then
-			characterModel:Destroy()
+		local elapsed = tick() - startTime
+		local alpha = math.min(elapsed / MoveDuration, 1)
+		
+		local currentX = startX + (endX - startX) * alpha
+		local currentPosition = Vector3.new(currentX, lanePosition.Y + 3, lanePosition.Z)
+		
+		characterModel:SetPrimaryPartCFrame(CFrame.new(currentPosition))
+		
+		if alpha >= 1 then
+			connection:Disconnect()
+			-- Only destroy if character is still in workspace and hasn't been purchased
+			if characterModel and characterModel.Parent == workspace and not characterModel:FindFirstChild("Purchased") then
+				characterModel:Destroy()
+			end
 		end
 	end)
 end
 
 -- Create a character model with billboard GUI
 function ShopLaneService.CreateCharacterModel(characterData)
-	-- Create the physical model
-	local model = Instance.new("Model")
+	-- Get the character model template from ReplicatedStorage
+	local characterModelsFolder = ReplicatedStorage:FindFirstChild("CharacterModels")
+	if not characterModelsFolder then
+		warn("[ShopLaneService] CharacterModels folder not found in ReplicatedStorage!")
+		return nil
+	end
+
+	local template = characterModelsFolder:FindFirstChild(characterData.modelKey)
+	if not template then
+		warn("[ShopLaneService] Model not found:", characterData.modelKey)
+		return nil
+	end
+
+	-- Clone the model
+	local model = template:Clone()
 	model.Name = "ShopCharacter_" .. characterData.name
 
-	local part = Instance.new("Part")
-	part.Name = "HitBox"
-	part.Size = characterData.size
-	part.Color = characterData.color
-	part.Material = Enum.Material.Neon
-	part.Anchored = true
-	part.CanCollide = false
-	part.Parent = model
+	-- Find humanoid and set properties
+	local humanoid = model:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		humanoid.HealthDisplayDistance = 0
+		humanoid.NameDisplayDistance = 0
+	end
+
+	-- Make sure we have a PrimaryPart
+	local rootPart = model:FindFirstChild("HumanoidRootPart")
+	if rootPart then
+		model.PrimaryPart = rootPart
+	end
+
+	-- Only anchor the primary part, don't touch other parts (Motor6Ds will handle movement)
+	if model.PrimaryPart then
+		model.PrimaryPart.Anchored = true
+	end
+
+	-- Disable collision for all parts
+	for _, part in pairs(model:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = false
+		end
+	end
 
 	-- Store character data in the model
 	local idValue = Instance.new("IntValue")
@@ -107,17 +153,22 @@ function ShopLaneService.CreateCharacterModel(characterData)
 	idValue.Value = characterData.id
 	idValue.Parent = model
 
-	-- Add click detector
-	local clickDetector = Instance.new("ClickDetector")
-	clickDetector.MaxActivationDistance = 32
-	clickDetector.Parent = part
+	-- Add click detector to HumanoidRootPart or PrimaryPart
+	local clickRoot = model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
+	if clickRoot then
+		local clickDetector = Instance.new("ClickDetector")
+		clickDetector.MaxActivationDistance = 32
+		clickDetector.Parent = clickRoot
+	end
 
-	-- Create billboard GUI
-	local billboard = Instance.new("BillboardGui")
-	billboard.Size = UDim2.new(0, 200, 0, 100)
-	billboard.StudsOffset = Vector3.new(0, characterData.size.Y / 2 + 1.5, 0)
-	billboard.AlwaysOnTop = true
-	billboard.Parent = part
+	-- Create billboard GUI above the character
+	local head = model:FindFirstChild("Head")
+	if head then
+		local billboard = Instance.new("BillboardGui")
+		billboard.Size = UDim2.new(0, 200, 0, 100)
+		billboard.StudsOffset = Vector3.new(0, 3, 0)
+		billboard.AlwaysOnTop = true
+		billboard.Parent = head
 
 	local frame = Instance.new("Frame")
 	frame.Size = UDim2.new(1, 0, 1, 0)
@@ -162,9 +213,10 @@ function ShopLaneService.CreateCharacterModel(characterData)
 	epsLabel.TextScaled = true
 	epsLabel.Font = UIConfig.Fonts.Body
 	epsLabel.Parent = frame
+	end
 
 	model.Parent = workspace
-	return part
+	return model
 end
 
 return ShopLaneService

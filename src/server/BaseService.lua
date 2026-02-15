@@ -38,10 +38,10 @@ function BaseService.AssignBase(player: Player): boolean
 end
 
 -- Add an earning character to a player's base (delegates to BasePadService)
-function BaseService.AddEarner(player: Player, characterData)
+function BaseService.AddEarner(player: Player, characterData, characterModel)
 	-- Add character to the appropriate tier basepad
 	local tier = characterData.tier or 1
-	BasePadService.AddCharacter(tier, characterData, player)
+	BasePadService.AddCharacter(tier, characterData, player, characterModel)
 
 	print(
 		"[BaseService] Added earner to",

@@ -89,14 +89,9 @@ function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
 		return
 	end
 
-	-- Mark character as sold immediately (prevent double-purchase race condition)
-	characterModel.Parent = nil -- Remove from workspace immediately
-
-	-- Deduct money
+	-- Deduct money first
 	local success = CurrencyService.DeductBalance(player, characterData.price)
 	if not success then
-		-- Refund by destroying the character (shouldn't happen, but safety check)
-		characterModel:Destroy()
 		PurchaseFeedbackEvent:FireClient(player, "error", "Purchase failed!")
 		return
 	end
@@ -104,11 +99,8 @@ function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
 	-- Update rate limit
 	LastPurchaseTime[player.UserId] = now
 
-	-- Add character to player's tier basepad (handles everything)
-	BaseService.AddEarner(player, characterData)
-
-	-- Destroy the character model (it's been cloned for delivery if needed)
-	characterModel:Destroy()
+	-- Add character to player's tier basepad, passing the actual model to be moved
+	BaseService.AddEarner(player, characterData, characterModel)
 
 	-- Send success feedback
 	PurchaseFeedbackEvent:FireClient(player, "success", "Bought " .. characterData.name .. "!")
