@@ -104,8 +104,8 @@ function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
 	-- Update rate limit
 	LastPurchaseTime[player.UserId] = now
 
-	-- Deliver character to base
-	PurchaseService.DeliverToBase(player, characterData)
+	-- Add character to player's tier basepad (handles everything)
+	BaseService.AddEarner(player, characterData)
 
 	-- Destroy the character model (it's been cloned for delivery if needed)
 	characterModel:Destroy()
@@ -139,45 +139,6 @@ function PurchaseService.IsPlayerInPurchaseZone(player: Player): boolean
 	local maxDistance = (purchaseZone.Size.Magnitude / 2) + 5 -- Add some buffer
 
 	return distance <= maxDistance
-end
-
--- Deliver purchased character to player's base
--- Note: Uses instant delivery (no movement) to avoid Tween.Completed reliability issues
--- Character immediately starts earning upon purchase (simplified gameplay)
-function PurchaseService.DeliverToBase(player: Player, characterData)
-	local base = BaseService.GetPlayerBase(player)
-
-	if not base then
-		warn("[PurchaseService] No base found for player:", player.Name)
-		return
-	end
-
-	-- Add to earning system immediately (no movement delay)
-	BaseService.AddEarner(player, characterData)
-
-	-- Create visual representation at base (instant spawn)
-	-- Parent to the base's parent (Bases folder) to avoid workspace lock issues
-	local visualModel = Instance.new("Model")
-	visualModel.Name = characterData.name
-
-	local part = Instance.new("Part")
-	part.Size = characterData.size * 0.8 -- Slightly smaller
-	part.Color = characterData.color
-	part.Material = Enum.Material.Neon
-	part.Anchored = true
-	part.CanCollide = false
-
-	-- Random position on base (aesthetic variation)
-	local random = Random.new()
-	local baseSize = base.Size
-	local offsetX = random:NextNumber(-baseSize.X / 3, baseSize.X / 3)
-	local offsetZ = random:NextNumber(-baseSize.Z / 3, baseSize.Z / 3)
-
-	part.Position = base.Position + Vector3.new(offsetX, characterData.size.Y / 2 + 1, offsetZ)
-	part.Parent = visualModel
-	
-	-- Parent to Bases folder (safe during runtime)
-	visualModel.Parent = base.Parent
 end
 
 -- Cleanup when player leaves

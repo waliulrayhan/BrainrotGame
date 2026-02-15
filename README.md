@@ -5,6 +5,31 @@ This guide will help you create a **colorful, fun, and eye-catching UI** that ki
 
 ---
 
+## 🔄 **Quick Reset: Start Fresh with $0**
+
+If you're testing in Roblox Studio and want to reset your balance to $0:
+
+**Method 1: Stop and Restart Test**
+1. Stop your current test session
+2. Click **"Server & Clients"** from the test mode dropdown
+3. Start the test - you'll have $0 balance
+
+**Method 2: Clear DataStore (Command Bar)**
+1. Stop your test
+2. Open the **Command Bar** (View → Command Bar)
+3. Paste this command:
+```lua
+game:GetService("DataStoreService"):GetDataStore("PlayerData_v1"):RemoveAsync("Player_" .. game.Players.LocalPlayer.UserId)
+```
+4. Press Enter
+5. Restart your test
+
+**Method 3: Fresh Start for Everyone**
+- Ask a developer to change `PlayerData_v1` to `PlayerData_v2` in SavingService.lua
+- This creates a new DataStore where everyone starts fresh
+
+---
+
 ## 🎯 What We're Building
 
 A super cool game interface with:

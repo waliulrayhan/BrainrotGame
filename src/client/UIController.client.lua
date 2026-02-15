@@ -86,9 +86,11 @@ end
 function UIController.OnClaimClicked()
 	if not claimButton then return end
 	
-	if currentUnclaimed > 0 then
-		RequestClaimEvent:FireServer()
+	-- Always send claim request to server, let server handle validation
+	RequestClaimEvent:FireServer()
 
+	-- Animate button only if there's something to claim
+	if currentUnclaimed > 0 then
 		-- Animate button (scale up slightly)
 		local originalSize = claimButton.Size
 		-- Scale UDim2 properly (multiply both scale and offset components)
@@ -127,9 +129,27 @@ end
 
 -- Show toast notification
 function UIController.ShowToast(type: string, message: string)
-	-- Check if notifications frame exists NOW, not at script start
-	if not notifications then 
-		print("[Toast]", type, "-", message)
+	-- Try to find notifications frame if not already cached
+	local notificationsFrame = notifications
+	if not notificationsFrame and mainHud then
+		notificationsFrame = mainHud:FindFirstChild("Notifications")
+	end
+	
+	-- If still not found, create it
+	if not notificationsFrame and mainHud then
+		notificationsFrame = Instance.new("Frame")
+		notificationsFrame.Name = "Notifications"
+		notificationsFrame.Size = UDim2.new(1, 0, 1, 0)
+		notificationsFrame.BackgroundTransparency = 1
+		notificationsFrame.ZIndex = 10
+		notificationsFrame.Parent = mainHud
+		notifications = notificationsFrame -- Cache it
+		print("[UIController] Created Notifications frame")
+	end
+	
+	-- Final check
+	if not notificationsFrame then 
+		print("[Toast] No MainHUD found -", type, "-", message)
 		return 
 	end
 	
@@ -141,7 +161,7 @@ function UIController.ShowToast(type: string, message: string)
 		elseif type == "error" then UIConfig.Toast.ErrorColor
 		else UIConfig.Toast.InfoColor
 	toast.BorderSizePixel = 0
-	toast.Parent = notifications
+	toast.Parent = notificationsFrame
 
 	-- Add rounded corners
 	local corner = Instance.new("UICorner")

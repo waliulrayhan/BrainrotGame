@@ -39,7 +39,7 @@ end
 -- Initialize player currency
 function CurrencyService.InitPlayer(player: Player, savedBalance: number?, savedUnclaimed: number?)
 	PlayerData[player.UserId] = {
-		Balance = ClampCurrency(savedBalance or 50), -- Starting balance
+		Balance = ClampCurrency(savedBalance or 0), -- Starting balance
 		Unclaimed = ClampCurrency(savedUnclaimed or 0),
 	}
 
@@ -92,6 +92,8 @@ end
 -- Claim unclaimed money (move to balance)
 function CurrencyService.ClaimMoney(player: Player): number
 	if not PlayerData[player.UserId] then
+		-- Send feedback even when player data doesn't exist
+		PurchaseFeedbackEvent:FireClient(player, "error", "Nothing to claim yet!")
 		return 0
 	end
 
@@ -103,7 +105,10 @@ function CurrencyService.ClaimMoney(player: Player): number
 		CurrencyService.SyncPlayer(player)
 
 		-- Send success feedback
-		PurchaseFeedbackEvent:FireClient(player, "success", "Claimed " .. tostring(math.floor(unclaimed)) .. "!")
+		PurchaseFeedbackEvent:FireClient(player, "success", "Claimed $" .. tostring(math.floor(unclaimed)) .. "!")
+	else
+		-- Send info message when nothing to claim
+		PurchaseFeedbackEvent:FireClient(player, "error", "Nothing to claim yet!")
 	end
 
 	return unclaimed
