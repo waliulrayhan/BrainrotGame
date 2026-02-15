@@ -40,12 +40,12 @@ Follow the **[README.md](README.md)** - Complete UI Guide
 **1. ShopLane (Folder)**
 - Add `LanePath` part inside
   - Size: `150, 1, 10`
-  - Position: `0, 5, 0` (adjust Y for your terrain)
+  - Position: `0, 13, 0`
   - Anchored: ✅ true
 
 **2. PurchaseZone (Part)**
 - Size: `15, 5, 15`
-- Position: `0, 3, -20`
+- Position: `0, 12.5, -14`
 - Transparency: `0.5`
 - BrickColor: Bright green
 - Anchored: ✅ true
@@ -54,7 +54,7 @@ Follow the **[README.md](README.md)** - Complete UI Guide
 **3. Bases (Folder)**
 - Create 3+ parts named `BasePad`
   - Size: `20, 1, 20` each
-  - Positions: Spread around (e.g., `0,3,-50`, `30,3,-50`, `-30,3,-50`)
+  - Positions: Spread around (e.g., `0,14,-44`, `30,14,-44`, `-30,14,-44`)
   - Anchored: ✅ true
   - BrickColor: Bright green
 
