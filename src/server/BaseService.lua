@@ -2,21 +2,25 @@
 	BaseService.lua
 	Manages player bases where purchased characters are placed and earn money.
 	Handles EPS calculation and the earning loop.
+	Now uses BasePadService for tier-based basepads.
 ]]
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Services = ServerScriptService:WaitForChild("Services")
+local BasePadService = require(Services:WaitForChild("BasePadService"))
 
 local BaseService = {}
-
--- Store base assignments and earners
-local PlayerBases = {} -- {[UserId] = BasePad}
-local BaseEarners = {} -- {[UserId] = {character1, character2, ...}}
 
 local CurrencyService
 
 function BaseService.Initialize(currencyService)
 	CurrencyService = currencyService
+
+	-- Initialize basepads
+	BasePadService.Initialize()
 
 	-- Start the earning loop
 	BaseService.StartEarningLoop()
@@ -24,55 +28,20 @@ function BaseService.Initialize(currencyService)
 	print("[BaseService] Initialized")
 end
 
--- Assign a base to a player
-function BaseService.AssignBase(player: Player): Part?
-	local bases = workspace:FindFirstChild("Bases")
-	if not bases then
-		warn("[BaseService] No Bases folder in workspace!")
-		return nil
-	end
-
-	-- Find an unassigned base
-	for _, basePad in bases:GetChildren() do
-		if basePad:IsA("BasePart") and basePad.Name == "BasePad" then
-			local assigned = false
-
-			-- Check if already assigned
-			for _, assignedBase in PlayerBases do
-				if assignedBase == basePad then
-					assigned = true
-					break
-				end
-			end
-
-			if not assigned then
-				PlayerBases[player.UserId] = basePad
-				BaseEarners[player.UserId] = {}
-
-				-- Visual feedback (optional - change base color)
-				basePad.BrickColor = BrickColor.new("Bright blue")
-
-				print("[BaseService] Assigned base to player:", player.Name)
-				return basePad
-			end
-		end
-	end
-
-	warn("[BaseService] No available bases for player:", player.Name)
-	return nil
+-- Assign a base to a player (now handled by BasePadService)
+-- This is kept for compatibility but basepads are tier-based now
+function BaseService.AssignBase(player: Player): boolean
+	-- Basepads are shared across all players per tier
+	-- No need to assign individual bases anymore
+	print("[BaseService] Player", player.Name, "can use tier-based basepads")
+	return true
 end
 
--- Add an earning character to a player's base
+-- Add an earning character to a player's base (delegates to BasePadService)
 function BaseService.AddEarner(player: Player, characterData)
-	if not BaseEarners[player.UserId] then
-		BaseEarners[player.UserId] = {}
-	end
-
-	table.insert(BaseEarners[player.UserId], {
-		id = characterData.id,
-		name = characterData.name,
-		eps = characterData.earningsPerSecond,
-	})
+	-- Add character to the appropriate tier basepad
+	local tier = characterData.tier or 1
+	BasePadService.AddCharacter(tier, characterData, player)
 
 	print(
 		"[BaseService] Added earner to",
@@ -84,26 +53,12 @@ end
 
 -- Calculate total earnings per second for a player
 function BaseService.GetTotalEPS(player: Player): number
-	if not BaseEarners[player.UserId] then
-		return 0
-	end
-
-	local totalEPS = 0
-	for _, earner in BaseEarners[player.UserId] do
-		totalEPS += earner.eps
-	end
-
-	return totalEPS
-end
-
--- Get player's base
-function BaseService.GetPlayerBase(player: Player): Part?
-	return PlayerBases[player.UserId]
+	return BasePadService.GetPlayerTotalEPS(player)
 end
 
 -- Get player's earners (for saving)
 function BaseService.GetPlayerEarners(player: Player)
-	return BaseEarners[player.UserId] or {}
+	return BasePadService.GetPlayerCharacters(player)
 end
 
 -- Restore earners from saved data
@@ -112,7 +67,7 @@ function BaseService.RestoreEarners(player: Player, savedEarners)
 		return
 	end
 
-	BaseEarners[player.UserId] = savedEarners
+	BasePadService.LoadPlayerCharacters(player, savedEarners)
 	print("[BaseService] Restored", #savedEarners, "earners for", player.Name)
 end
 
@@ -143,8 +98,7 @@ end
 
 -- Cleanup when player leaves
 function BaseService.CleanupPlayer(player: Player)
-	PlayerBases[player.UserId] = nil
-	BaseEarners[player.UserId] = nil
+	BasePadService.ClearPlayerCharacters(player)
 	print("[BaseService] Cleaned up player:", player.Name)
 end
 

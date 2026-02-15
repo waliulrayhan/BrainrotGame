@@ -157,7 +157,7 @@
 **Problem**: Characters could be double-purchased
 **Solution**: 
 - Check `characterModel.Parent` exists before purchase
-- Verify character is in workspace (not in Bases folder)
+- Verify character is in workspace (not in BasePads folder)
 - Remove from workspace immediately (`Parent = nil`)
 - Destroy after purchase completes
 

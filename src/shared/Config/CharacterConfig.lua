@@ -9,73 +9,63 @@ local CharacterConfig = {}
 CharacterConfig.Characters = {
 	{
 		id = 1,
-		name = "Skibidi Starter",
+		tier = 1,
+		name = "Tiny Brainrot",
+		modelKey = "Brainrot_T1",
 		price = 0,
 		earningsPerSecond = 1,
 		color = Color3.fromRGB(150, 150, 150), -- Gray
 		size = Vector3.new(2, 2, 2),
 		spawnWeight = 40, -- Higher weight = more common
-		description = "The beginning of brainrot",
+		description = "The smallest brainrot",
 	},
 	{
 		id = 2,
-		name = "Rizz Collector",
+		tier = 2,
+		name = "Better Brainrot",
+		modelKey = "Brainrot_T2",
 		price = 25,
 		earningsPerSecond = 3,
 		color = Color3.fromRGB(100, 200, 100), -- Green
 		size = Vector3.new(2.5, 2.5, 2.5),
 		spawnWeight = 30,
-		description = "Gathering rizz points",
+		description = "Getting better at brainrot",
 	},
 	{
 		id = 3,
-		name = "Sigma Grinder",
+		tier = 3,
+		name = "Epic Brainrot",
+		modelKey = "Brainrot_T3",
 		price = 150,
 		earningsPerSecond = 10,
 		color = Color3.fromRGB(100, 100, 255), -- Blue
 		size = Vector3.new(3, 3, 3),
 		spawnWeight = 20,
-		description = "Grinding on the sigma wavelength",
+		description = "Epic level brainrot",
 	},
 	{
 		id = 4,
-		name = "Gyatt Farmer",
+		tier = 4,
+		name = "Mythic Brainrot",
+		modelKey = "Brainrot_T4",
 		price = 800,
 		earningsPerSecond = 40,
 		color = Color3.fromRGB(255, 165, 0), -- Orange
 		size = Vector3.new(3.5, 3.5, 3.5),
 		spawnWeight = 15,
-		description = "Farming gyatts all day",
+		description = "Mythical brainrot power",
 	},
 	{
 		id = 5,
-		name = "Ohio Final Boss",
+		tier = 5,
+		name = "Legend Brainrot",
+		modelKey = "Brainrot_T5",
 		price = 3500,
 		earningsPerSecond = 120,
 		color = Color3.fromRGB(200, 0, 200), -- Purple
 		size = Vector3.new(4, 4, 4),
 		spawnWeight = 8,
-		description = "Only in Ohio",
-	},
-	{
-		id = 6,
-		name = "Fanum Tax King",
-		price = 15000,
-		earningsPerSecond = 400,
-		color = Color3.fromRGB(255, 215, 0), -- Gold
-		size = Vector3.new(4.5, 4.5, 4.5),
-		spawnWeight = 4,
-		description = "Taxing everyone's food",
-	},
-	{
-		id = 7,
-		name = "Mewing Master",
-		price = 60000,
-		earningsPerSecond = 1200,
-		color = Color3.fromRGB(0, 255, 255), -- Cyan
-		size = Vector3.new(5, 5, 5),
-		spawnWeight = 2,
-		description = "Perfect jawline achieved",
+		description = "Legendary brainrot master",
 	},
 }
 

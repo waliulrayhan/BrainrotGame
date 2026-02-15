@@ -51,12 +51,30 @@ Follow the **[README.md](README.md)** - Complete UI Guide
 - Anchored: ✅ true
 - CanCollide: ❌ false
 
-**3. Bases (Folder)**
-- Create 3+ parts named `BasePad`
-  - Size: `20, 1, 20` each
-  - Positions: Spread around (e.g., `0,14,-44`, `30,14,-44`, `-30,14,-44`)
-  - Anchored: ✅ true
-  - BrickColor: Bright green
+**3. BasePads (Folder) - NEW TIER-BASED SYSTEM**
+- Create 5 parts for tier-specific basepads:
+  - `BasePad_T1` - Tier 1 (Tiny Brainrot)
+    - Size: `20, 1, 20`
+    - Position: `10, 0.5, 10`
+    - Anchored: ✅ true
+  - `BasePad_T2` - Tier 2 (Better Brainrot)
+    - Size: `20, 1, 20`
+    - Position: `40, 0.5, 10`
+    - Anchored: ✅ true
+  - `BasePad_T3` - Tier 3 (Epic Brainrot)
+    - Size: `20, 1, 20`
+    - Position: `70, 0.5, 10`
+    - Anchored: ✅ true
+  - `BasePad_T4` - Tier 4 (Mythic Brainrot)
+    - Size: `20, 1, 20`
+    - Position: `100, 0.5, 10`
+    - Anchored: ✅ true
+  - `BasePad_T5` - Tier 5 (Legend Brainrot)
+    - Size: `20, 1, 20`
+    - Position: `130, 0.5, 10`
+    - Anchored: ✅ true
+
+See [WORKSPACE_SETUP.md](WORKSPACE_SETUP.md) for detailed setup instructions.
 
 ---
 
@@ -149,7 +167,7 @@ Before you start playing:
 **3D World:**
 - [ ] ShopLane folder with LanePath part
 - [ ] PurchaseZone (green glowing part)
-- [ ] Bases folder with 3+ BasePad parts
+- [ ] BasePads folder with 5 tier-specific basepads (BasePad_T1 through BasePad_T5)
 
 **UI (in StarterGui):**
 - [ ] MainHUD ScreenGui
