@@ -38,13 +38,13 @@ function SavingService.LoadPlayerData(player: Player)
 	end)
 
 	if success and data then
-		print("[SavingService] Loaded data for", player.Name)
+		print("[SavingService] ✓ Loaded data for", player.Name, "- Balance:", data.Balance, "Unclaimed:", data.Unclaimed, "Earners:", data.Earners and #data.Earners or 0)
 		return data
 	elseif success then
 		print("[SavingService] No saved data for", player.Name, "- New player")
 		return nil
 	else
-		warn("[SavingService] Failed to load data for", player.Name)
+		warn("[SavingService] ✗ Failed to load data for", player.Name)
 		return nil
 	end
 end
@@ -70,16 +70,19 @@ function SavingService.SavePlayerData(player: Player)
 		LastSave = os.time(),
 	}
 
+	-- Debug: Print what we're saving
+	print("[SavingService] Saving for", player.Name, "- Balance:", dataToSave.Balance, "Unclaimed:", dataToSave.Unclaimed, "Earners:", #earners)
+
 	local success = SavingService.RetryOperation(function()
 		PlayerDataStore:SetAsync(key, dataToSave)
 		return true
 	end)
 
 	if success then
-		print("[SavingService] Saved data for", player.Name)
+		print("[SavingService] ✓ Successfully saved data for", player.Name)
 		return true
 	else
-		warn("[SavingService] Failed to save data for", player.Name)
+		warn("[SavingService] ✗ Failed to save data for", player.Name)
 		return false
 	end
 end

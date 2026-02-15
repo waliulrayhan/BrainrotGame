@@ -56,9 +56,9 @@ function BaseService.GetTotalEPS(player: Player): number
 	return BasePadService.GetPlayerTotalEPS(player)
 end
 
--- Get player's earners (for saving)
+-- Get player's earners (for saving) - returns serializable data only
 function BaseService.GetPlayerEarners(player: Player)
-	return BasePadService.GetPlayerCharacters(player)
+	return BasePadService.GetPlayerEarnersForSave(player)
 end
 
 -- Restore earners from saved data

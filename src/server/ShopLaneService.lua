@@ -15,6 +15,9 @@ local LanePath
 local SpawnInterval = 3 -- Seconds between spawns
 local MoveDuration = 15 -- Seconds to cross the lane
 
+-- Performance: Use single loop for all characters instead of 50 separate Heartbeat connections
+local ActiveCharacters = {}
+
 function ShopLaneService.Initialize()
 	-- Get the lane path
 	local shopLane = workspace:FindFirstChild("ShopLane")
@@ -29,10 +32,61 @@ function ShopLaneService.Initialize()
 		return
 	end
 
+	-- Start single Heartbeat loop for all character movement
+	ShopLaneService.StartMovementLoop()
+
 	-- Start spawning characters
 	ShopLaneService.StartSpawning()
 
 	print("[ShopLaneService] Initialized")
+end
+
+-- Single Heartbeat loop that updates all active characters (performance optimization)
+function ShopLaneService.StartMovementLoop()
+	game:GetService("RunService").Heartbeat:Connect(function()
+		-- Iterate backwards to safely remove completed characters
+		for i = #ActiveCharacters, 1, -1 do
+			local charData = ActiveCharacters[i]
+			
+			-- Update returns true if movement is complete
+			if ShopLaneService.UpdateCharacterMovement(charData) then
+				table.remove(ActiveCharacters, i)
+			end
+		end
+	end)
+end
+
+-- Update a single character's movement (returns true if complete)
+function ShopLaneService.UpdateCharacterMovement(charData): boolean
+	local characterModel = charData.model
+	
+	-- Check if character was purchased (stop movement)
+	if characterModel:FindFirstChild("Purchased") then
+		return true -- Remove from active list
+	end
+	
+	-- Check if model still exists
+	if not characterModel or not characterModel.Parent or not characterModel.PrimaryPart then
+		return true -- Remove from active list
+	end
+
+	local elapsed = tick() - charData.startTime
+	local alpha = math.min(elapsed / MoveDuration, 1)
+	
+	local currentX = charData.startX + (charData.endX - charData.startX) * alpha
+	local currentPosition = Vector3.new(currentX, charData.posY, charData.posZ)
+	
+	characterModel:SetPrimaryPartCFrame(CFrame.new(currentPosition))
+	
+	if alpha >= 1 then
+		-- Movement complete - destroy if not purchased
+		if characterModel and characterModel.Parent == workspace and not characterModel:FindFirstChild("Purchased") then
+			characterModel:Destroy()
+		end
+		return true -- Remove from active list
+	end
+	
+	return false -- Keep updating
 end
 
 -- Start the character spawning loop
@@ -69,37 +123,15 @@ function ShopLaneService.SpawnCharacter()
 		return
 	end
 
-	-- Tween across the lane using SetPrimaryPartCFrame in a loop for smooth movement
-	local startTime = tick()
-	local connection
-	connection = game:GetService("RunService").Heartbeat:Connect(function()
-		-- Check if character was purchased (stop movement)
-		if characterModel:FindFirstChild("Purchased") then
-			if connection then connection:Disconnect() end
-			return
-		end
-		
-		if not characterModel or not characterModel.Parent or not characterModel.PrimaryPart then
-			if connection then connection:Disconnect() end
-			return
-		end
-
-		local elapsed = tick() - startTime
-		local alpha = math.min(elapsed / MoveDuration, 1)
-		
-		local currentX = startX + (endX - startX) * alpha
-		local currentPosition = Vector3.new(currentX, lanePosition.Y + 3, lanePosition.Z)
-		
-		characterModel:SetPrimaryPartCFrame(CFrame.new(currentPosition))
-		
-		if alpha >= 1 then
-			connection:Disconnect()
-			-- Only destroy if character is still in workspace and hasn't been purchased
-			if characterModel and characterModel.Parent == workspace and not characterModel:FindFirstChild("Purchased") then
-				characterModel:Destroy()
-			end
-		end
-	end)
+	-- Add to active characters list (single Heartbeat will update all)
+	table.insert(ActiveCharacters, {
+		model = characterModel,
+		startTime = tick(),
+		startX = startX,
+		endX = endX,
+		posY = lanePosition.Y + 3,
+		posZ = lanePosition.Z,
+	})
 end
 
 -- Create a character model with billboard GUI

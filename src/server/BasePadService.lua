@@ -341,6 +341,24 @@ function BasePadService.GetPlayerCharacters(player: Player)
 	return playerCharacters
 end
 
+-- Get serializable earner data for saving (no Roblox Instances!)
+function BasePadService.GetPlayerEarnersForSave(player: Player)
+	local earnerData = {}
+
+	for tier, characters in pairs(BasePadCharacters) do
+		for _, character in ipairs(characters) do
+			if character.owner == player.UserId then
+				-- Only save the character ID, not the model or other non-serializable data
+				table.insert(earnerData, {
+					id = character.id,
+				})
+			end
+		end
+	end
+
+	return earnerData
+end
+
 -- Calculate total EPS for a player across all basepads
 function BasePadService.GetPlayerTotalEPS(player: Player): number
 	local totalEPS = 0
