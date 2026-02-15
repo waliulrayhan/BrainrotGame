@@ -114,10 +114,14 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 		model.PrimaryPart.Anchored = true
 	end
 
-	-- Disable collision for all parts
+	-- Disable collision for all parts and apply tier color
 	for _, part in pairs(model:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.CanCollide = false
+			-- Apply character color to body parts
+			if part.Name ~= "HumanoidRootPart" then
+				part.Color = characterData.color
+			end
 		end
 	end
 
@@ -144,17 +148,26 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 	idValue.Parent = model
 
 	-- Add a name tag
-	local head = model:FindFirstChild("Head")
-	if head then
+	local billboardPart = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head") or model.PrimaryPart
+	if billboardPart then
 		local billboard = Instance.new("BillboardGui")
-		billboard.Size = UDim2.new(0, 150, 0, 50)
+		billboard.Size = UDim2.new(0, 100, 0, 40)
 		billboard.StudsOffset = Vector3.new(0, 3, 0)
 		billboard.AlwaysOnTop = true
-		billboard.Parent = head
+		billboard.Parent = billboardPart
 
 		local frame = Instance.new("Frame")
 		frame.Size = UDim2.new(1, 0, 1, 0)
-		frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		
+		-- Color based on tier
+		local tierColors = {
+			Color3.fromRGB(100, 100, 100), -- Tier 1: Gray
+			Color3.fromRGB(50, 150, 50),   -- Tier 2: Green
+			Color3.fromRGB(50, 100, 200),  -- Tier 3: Blue
+			Color3.fromRGB(200, 120, 0),   -- Tier 4: Orange
+			Color3.fromRGB(150, 0, 150),   -- Tier 5: Purple
+		}
+		frame.BackgroundColor3 = tierColors[tier] or Color3.fromRGB(0, 0, 0)
 		frame.BackgroundTransparency = 0.5
 		frame.BorderSizePixel = 0
 		frame.Parent = billboard
@@ -164,8 +177,8 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 		corner.Parent = frame
 
 		local nameLabel = Instance.new("TextLabel")
-		nameLabel.Size = UDim2.new(1, -10, 0.5, 0)
-		nameLabel.Position = UDim2.new(0, 5, 0, 0)
+		nameLabel.Size = UDim2.new(1, -6, 0.5, 0)
+		nameLabel.Position = UDim2.new(0, 3, 0, 0)
 		nameLabel.BackgroundTransparency = 1
 		nameLabel.Text = characterData.name
 		nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -174,8 +187,8 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 		nameLabel.Parent = frame
 
 		local epsLabel = Instance.new("TextLabel")
-		epsLabel.Size = UDim2.new(1, -10, 0.5, 0)
-		epsLabel.Position = UDim2.new(0, 5, 0.5, 0)
+		epsLabel.Size = UDim2.new(1, -6, 0.5, 0)
+		epsLabel.Position = UDim2.new(0, 3, 0.5, 0)
 		epsLabel.BackgroundTransparency = 1
 		epsLabel.Text = "$" .. characterData.earningsPerSecond .. "/s"
 		epsLabel.TextColor3 = Color3.fromRGB(0, 255, 127)

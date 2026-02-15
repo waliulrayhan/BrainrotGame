@@ -78,7 +78,7 @@ function PurchaseService.HandlePurchaseRequest(player: Player, characterModel)
 
 	-- Check if player is in purchase zone
 	if not PurchaseService.IsPlayerInPurchaseZone(player) then
-		PurchaseFeedbackEvent:FireClient(player, "error", "Get closer to the lane!")
+		PurchaseFeedbackEvent:FireClient(player, "error", "Get closer to the Purchase Zone!")
 		return
 	end
 
