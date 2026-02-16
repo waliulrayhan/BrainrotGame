@@ -14,6 +14,7 @@ local BaseService = require(Services:WaitForChild("BaseService"))
 local ShopLaneService = require(Services:WaitForChild("ShopLaneService"))
 local PurchaseService = require(Services:WaitForChild("PurchaseService"))
 local SavingService = require(Services:WaitForChild("SavingService"))
+local TutorialService = require(Services:WaitForChild("TutorialService"))
 
 -- Remote events
 local RequestClaimEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("RequestClaim")
@@ -26,6 +27,7 @@ BaseService.Initialize(CurrencyService)
 ShopLaneService.Initialize()
 PurchaseService.Initialize(CurrencyService, BaseService)
 SavingService.Initialize(CurrencyService, BaseService)
+TutorialService.Initialize()
 
 print("=== ALL SERVICES INITIALIZED ===")
 
@@ -52,6 +54,9 @@ Players.PlayerAdded:Connect(function(player)
 	if savedData and savedData.Earners then
 		BaseService.RestoreEarners(player, savedData.Earners)
 	end
+
+	-- Check if player should see tutorial (for new players)
+	TutorialService.CheckAndShowTutorial(player, savedData)
 
 	print("[MainServer] Player fully initialized:", player.Name)
 end)

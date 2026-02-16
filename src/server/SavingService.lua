@@ -67,6 +67,7 @@ function SavingService.SavePlayerData(player: Player)
 		Balance = currencyData.Balance,
 		Unclaimed = currencyData.Unclaimed,
 		Earners = earners,
+		HasSeenTutorial = true, -- Always save as true after first play
 		LastSave = os.time(),
 	}
 

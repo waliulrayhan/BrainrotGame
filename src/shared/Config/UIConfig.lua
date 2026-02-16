@@ -104,4 +104,22 @@ UIConfig.Layout = {
 	CornerRadius = UDim.new(0, 8),
 }
 
+-- Tutorial Settings
+UIConfig.Tutorial = {
+	Title = "HOW TO PLAY",
+	Instructions = {
+		"1. Click on shop characters to buy them",
+		"2. Characters will earn money for you automatically",
+		"3. Better characters = more money per second",
+		"4. Claim your earnings with the CLAIM button",
+		"5. Keep buying to grow your empire",
+	},
+	BackgroundColor = Color3.fromRGB(25, 25, 35), -- Dark Blue-Gray
+	TitleColor = Color3.fromRGB(100, 200, 255), -- Bright Blue
+	TextColor = Color3.fromRGB(230, 230, 230), -- Light Gray
+	ButtonColor = Color3.fromRGB(50, 150, 255), -- Blue
+	ButtonHoverColor = Color3.fromRGB(70, 170, 255), -- Lighter Blue
+	OverlayTransparency = 0.6, -- Semi-transparent overlay
+}
+
 return UIConfig

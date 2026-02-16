@@ -21,6 +21,12 @@
           },
           "PurchaseFeedback": {
             "$className": "RemoteEvent"
+          },
+          "ShowTutorial": {
+            "$className": "RemoteEvent"
+          },
+          "TutorialCompleted": {
+            "$className": "RemoteEvent"
           }
         }
       }

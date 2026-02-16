@@ -20,6 +20,10 @@ local RequestClaimEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild(
 local PurchaseFeedbackEvent = ReplicatedStorage:WaitForChild("Shared")
 	:WaitForChild("Remotes")
 	:WaitForChild("PurchaseFeedback")
+local ShowTutorialEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("ShowTutorial")
+local TutorialCompletedEvent = ReplicatedStorage:WaitForChild("Shared")
+	:WaitForChild("Remotes")
+	:WaitForChild("TutorialCompleted")
 
 -- UI Elements (wait longer for UI to be created)
 local mainHud = playerGui:WaitForChild("MainHUD", 30) -- Wait up to 30 seconds
@@ -218,6 +222,164 @@ function UIController.ShowToast(type: string, message: string)
 	toast:Destroy()
 end
 
+-- Show Tutorial UI
+function UIController.ShowTutorial()
+	print("[UIController] Showing tutorial UI")
+	
+	-- Create ScreenGui container (required for UI to display)
+	local tutorialScreenGui = Instance.new("ScreenGui")
+	tutorialScreenGui.Name = "TutorialScreenGui"
+	tutorialScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	tutorialScreenGui.DisplayOrder = 100 -- On top of other ScreenGuis
+	tutorialScreenGui.ResetOnSpawn = false
+	tutorialScreenGui.IgnoreGuiInset = true -- Ensures truly full screen
+	tutorialScreenGui.Parent = playerGui
+	
+	-- Create full-screen overlay (blocks interaction with game)
+	local tutorialOverlay = Instance.new("Frame")
+	tutorialOverlay.Name = "TutorialOverlay"
+	tutorialOverlay.Size = UDim2.new(1, 0, 1, 0) -- Full screen
+	tutorialOverlay.Position = UDim2.new(0, 0, 0, 0) -- From top-left corner
+	tutorialOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	tutorialOverlay.BackgroundTransparency = UIConfig.Tutorial.OverlayTransparency
+	tutorialOverlay.BorderSizePixel = 0
+	tutorialOverlay.ZIndex = 1
+	tutorialOverlay.Parent = tutorialScreenGui
+	
+	-- Create tutorial panel
+	local tutorialPanel = Instance.new("Frame")
+	tutorialPanel.Name = "TutorialPanel"
+	tutorialPanel.Size = UDim2.new(0, 600, 0, 500)
+	tutorialPanel.Position = UDim2.new(0.5, -300, 0.5, -250)
+	tutorialPanel.BackgroundColor3 = UIConfig.Tutorial.BackgroundColor
+	tutorialPanel.BorderSizePixel = 0
+	tutorialPanel.ZIndex = 2
+	tutorialPanel.Parent = tutorialOverlay
+	
+	-- Add rounded corners to panel
+	local panelCorner = Instance.new("UICorner")
+	panelCorner.CornerRadius = UDim.new(0, 20)
+	panelCorner.Parent = tutorialPanel
+	
+	-- Add border
+	local panelStroke = Instance.new("UIStroke")
+	panelStroke.Color = UIConfig.Tutorial.TitleColor
+	panelStroke.Thickness = 3
+	panelStroke.Transparency = 0.3
+	panelStroke.Parent = tutorialPanel
+	
+	-- Title
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Name = "Title"
+	titleLabel.Size = UDim2.new(1, -40, 0, 80)
+	titleLabel.Position = UDim2.new(0, 20, 0, 20)
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.Text = UIConfig.Tutorial.Title
+	titleLabel.TextColor3 = UIConfig.Tutorial.TitleColor
+	titleLabel.TextSize = 38
+	titleLabel.Font = UIConfig.Fonts.Header
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+	titleLabel.ZIndex = 3
+	titleLabel.Parent = tutorialPanel
+	
+	-- Add subtle text stroke to title
+	local titleStroke = Instance.new("UIStroke")
+	titleStroke.Color = Color3.fromRGB(0, 0, 0)
+	titleStroke.Thickness = 2
+	titleStroke.Transparency = 0.5
+	titleStroke.Parent = titleLabel
+	
+	-- Instructions container
+	local instructionsFrame = Instance.new("Frame")
+	instructionsFrame.Name = "Instructions"
+	instructionsFrame.Size = UDim2.new(1, -60, 0, 260)
+	instructionsFrame.Position = UDim2.new(0, 30, 0, 110)
+	instructionsFrame.BackgroundTransparency = 1
+	instructionsFrame.ZIndex = 3
+	instructionsFrame.Parent = tutorialPanel
+	
+	-- Add each instruction line
+	local yOffset = 0
+	for i, instruction in ipairs(UIConfig.Tutorial.Instructions) do
+		local instructionLabel = Instance.new("TextLabel")
+		instructionLabel.Name = "Instruction" .. i
+		instructionLabel.Size = UDim2.new(1, 0, 0, 42)
+		instructionLabel.Position = UDim2.new(0, 0, 0, yOffset)
+		instructionLabel.BackgroundTransparency = 1
+		instructionLabel.Text = instruction
+		instructionLabel.TextColor3 = UIConfig.Tutorial.TextColor
+		instructionLabel.TextSize = 20
+		instructionLabel.Font = UIConfig.Fonts.Body
+		instructionLabel.TextXAlignment = Enum.TextXAlignment.Left
+		instructionLabel.TextYAlignment = Enum.TextYAlignment.Top
+		instructionLabel.TextWrapped = true
+		instructionLabel.ZIndex = 3
+		instructionLabel.Parent = instructionsFrame
+		
+		yOffset = yOffset + 48
+	end
+	
+	-- "I Understand" button at bottom
+	local understandButton = Instance.new("TextButton")
+	understandButton.Name = "UnderstandButton"
+	understandButton.Size = UDim2.new(0, 280, 0, 55)
+	understandButton.Position = UDim2.new(0.5, -140, 1, -75)
+	understandButton.BackgroundColor3 = UIConfig.Tutorial.ButtonColor
+	understandButton.Text = "I UNDERSTAND"
+	understandButton.TextColor3 = Color3.new(1, 1, 1)
+	understandButton.TextSize = 24
+	understandButton.Font = UIConfig.Fonts.Button
+	understandButton.BorderSizePixel = 0
+	understandButton.ZIndex = 3
+	understandButton.AutoButtonColor = true -- Enable hover effect
+	understandButton.Parent = tutorialPanel
+	
+	local buttonCorner = Instance.new("UICorner")
+	buttonCorner.CornerRadius = UDim.new(0, 12)
+	buttonCorner.Parent = understandButton
+	
+	-- Function to close tutorial
+	local function closeTutorial()
+		-- Notify server that tutorial is completed
+		TutorialCompletedEvent:FireServer()
+		
+		-- Animate out
+		local fadeOut = TweenService:Create(
+			tutorialOverlay,
+			TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{ BackgroundTransparency = 1 }
+		)
+		local panelOut = TweenService:Create(
+			tutorialPanel,
+			TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+			{ Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0) }
+		)
+		
+		fadeOut:Play()
+		panelOut:Play()
+		
+		panelOut.Completed:Wait()
+		tutorialScreenGui:Destroy()
+		
+		print("[UIController] Tutorial closed")
+	end
+	
+	-- Connect button event
+	understandButton.MouseButton1Click:Connect(closeTutorial)
+	
+	-- Animate in
+	tutorialPanel.Size = UDim2.new(0, 0, 0, 0)
+	tutorialPanel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	
+	local panelIn = TweenService:Create(
+		tutorialPanel,
+		TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{ Size = UDim2.new(0, 600, 0, 500), Position = UDim2.new(0.5, -300, 0.5, -250) }
+	)
+	
+	panelIn:Play()
+end
+
 -- Initialize controller
 function UIController.Initialize()
 	if not mainHud or not claimButton then
@@ -299,6 +461,11 @@ end)
 -- Handle purchase feedback
 PurchaseFeedbackEvent.OnClientEvent:Connect(function(type, message)
 	UIController.ShowToast(type, message)
+end)
+
+-- Handle tutorial show request from server
+ShowTutorialEvent.OnClientEvent:Connect(function()
+	UIController.ShowTutorial()
 end)
 
 -- Initialize
