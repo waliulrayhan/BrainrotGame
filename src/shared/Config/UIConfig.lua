@@ -5,23 +5,33 @@
 
 local UIConfig = {}
 
--- Color Palette (Bright, Kid-Friendly Theme!)
+-- Color Palette (Professional Blue-Gray Theme)
 UIConfig.Colors = {
-	Primary = Color3.fromRGB(75, 0, 130), -- Purple
-	Secondary = Color3.fromRGB(255, 20, 147), -- Deep Pink
-	Accent = Color3.fromRGB(0, 255, 255), -- Bright Cyan
-	Success = Color3.fromRGB(0, 255, 127), -- Spring Green
-	Warning = Color3.fromRGB(255, 215, 0), -- Gold
-	Danger = Color3.fromRGB(255, 69, 0), -- Red-Orange
+	-- Main UI Colors
+	Primary = Color3.fromRGB(50, 150, 255), -- Bright Blue
+	Secondary = Color3.fromRGB(70, 170, 255), -- Light Blue
+	Accent = Color3.fromRGB(100, 200, 255), -- Accent Blue
+	Success = Color3.fromRGB(80, 200, 120), -- Soft Green
+	Warning = Color3.fromRGB(255, 180, 50), -- Soft Orange
+	Danger = Color3.fromRGB(255, 100, 100), -- Soft Red
 	Text = Color3.fromRGB(255, 255, 255), -- Pure White
-	TextDim = Color3.fromRGB(200, 200, 255), -- Light Purple
+	TextDim = Color3.fromRGB(180, 200, 220), -- Light Blue-Gray
 	
-	-- Additional fun colors!
-	Gold = Color3.fromRGB(255, 215, 0),
-	Magenta = Color3.fromRGB(255, 0, 255),
-	HotPink = Color3.fromRGB(255, 105, 180),
-	SpringGreen = Color3.fromRGB(0, 255, 127),
-	Yellow = Color3.fromRGB(255, 255, 0),
+	-- UI Element Colors
+	DarkBackground = Color3.fromRGB(25, 25, 35), -- Dark Blue-Gray
+	MediumBackground = Color3.fromRGB(35, 45, 60), -- Medium Blue-Gray
+	LightBackground = Color3.fromRGB(45, 60, 80), -- Light Blue-Gray
+	
+	-- Money/Balance Colors
+	MoneyGold = Color3.fromRGB(255, 200, 80), -- Soft Gold
+	MoneyGreen = Color3.fromRGB(100, 220, 150), -- Mint Green
+	
+	-- Special Colors (kept for legacy compatibility)
+	Gold = Color3.fromRGB(255, 200, 80),
+	Magenta = Color3.fromRGB(180, 100, 255), -- Soft Purple
+	HotPink = Color3.fromRGB(255, 120, 180), -- Soft Pink
+	SpringGreen = Color3.fromRGB(100, 220, 150),
+	Yellow = Color3.fromRGB(255, 220, 100),
 }
 
 -- Fonts
@@ -86,14 +96,14 @@ function UIConfig.FormatEPS(eps: number): string
 	return string.format("+%.2f%s/s", rounded, Suffixes[index])
 end
 
--- Toast Notification Settings (Bright and Fun!)
+-- Toast Notification Settings (Modern Blue Theme)
 UIConfig.Toast = {
 	Duration = 2.5, -- Seconds to show toast
 	Height = 60,
 	Padding = 10,
-	SuccessColor = Color3.fromRGB(0, 255, 127), -- Bright green
-	ErrorColor = Color3.fromRGB(255, 69, 0), -- Bright red-orange
-	InfoColor = Color3.fromRGB(0, 191, 255), -- Deep sky blue
+	SuccessColor = Color3.fromRGB(80, 200, 120), -- Soft Green
+	ErrorColor = Color3.fromRGB(255, 100, 100), -- Soft Red
+	InfoColor = Color3.fromRGB(50, 150, 255), -- Bright Blue
 }
 
 -- UI Measurements

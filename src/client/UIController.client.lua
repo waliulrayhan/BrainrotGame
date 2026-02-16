@@ -76,11 +76,12 @@ function UIController.StartUpdateLoop()
 
 		-- Highlight claim button if unclaimed > 0
 		if currentUnclaimed > 0 then
-			-- Make button bright and pulsing when money is available!
-			claimButton.BackgroundColor3 = UIConfig.Colors.Magenta
+			-- Bright attention-grabbing color when money is available!
+			claimButton.BackgroundColor3 = Color3.fromRGB(255, 50, 150) -- Hot Pink
 			claimButton.Text = "CLAIM!"
 		else
-			claimButton.BackgroundColor3 = UIConfig.Colors.Secondary
+			-- Dark, subtle color when nothing to claim
+			claimButton.BackgroundColor3 = Color3.fromRGB(40, 50, 70) -- Dark Blue-Gray
 			claimButton.Text = "CLAIM"
 		end
 	end)
@@ -448,10 +449,10 @@ StateUpdateEvent.OnClientEvent:Connect(function(data)
 		-- Update claim button if it exists
 		if claimButton then
 			if data.Unclaimed > 0 then
-				claimButton.BackgroundColor3 = UIConfig.Colors.Magenta
+				claimButton.BackgroundColor3 = Color3.fromRGB(255, 50, 150) -- Hot Pink
 				claimButton.Text = "CLAIM!"
 			else
-				claimButton.BackgroundColor3 = UIConfig.Colors.Secondary
+				claimButton.BackgroundColor3 = Color3.fromRGB(40, 50, 70) -- Dark Blue-Gray
 				claimButton.Text = "CLAIM"
 			end
 		end

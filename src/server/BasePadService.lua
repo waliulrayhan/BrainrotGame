@@ -159,16 +159,16 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 		local frame = Instance.new("Frame")
 		frame.Size = UDim2.new(1, 0, 1, 0)
 		
-		-- Color based on tier
+		-- Color based on tier (Darker, more readable colors)
 		local tierColors = {
-			Color3.fromRGB(100, 100, 100), -- Tier 1: Gray
-			Color3.fromRGB(50, 150, 50),   -- Tier 2: Green
-			Color3.fromRGB(50, 100, 200),  -- Tier 3: Blue
-			Color3.fromRGB(200, 120, 0),   -- Tier 4: Orange
-			Color3.fromRGB(150, 0, 150),   -- Tier 5: Purple
+			Color3.fromRGB(80, 100, 120),   -- Tier 1: Dark Blue-Gray
+			Color3.fromRGB(60, 160, 100),   -- Tier 2: Dark Mint Green
+			Color3.fromRGB(30, 100, 200),   -- Tier 3: Deep Blue
+			Color3.fromRGB(130, 60, 200),   -- Tier 4: Deep Purple
+			Color3.fromRGB(220, 100, 60),   -- Tier 5: Deep Coral
 		}
-		frame.BackgroundColor3 = tierColors[tier] or Color3.fromRGB(0, 0, 0)
-		frame.BackgroundTransparency = 0.5
+		frame.BackgroundColor3 = tierColors[tier] or Color3.fromRGB(35, 45, 60)
+		frame.BackgroundTransparency = 0.1 -- More opaque
 		frame.BorderSizePixel = 0
 		frame.Parent = billboard
 
@@ -185,16 +185,28 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 		nameLabel.TextScaled = true
 		nameLabel.Font = Enum.Font.GothamBold
 		nameLabel.Parent = frame
+		
+		-- Add text stroke for readability
+		local nameStroke = Instance.new("UIStroke")
+		nameStroke.Color = Color3.fromRGB(0, 0, 0)
+		nameStroke.Thickness = 2
+		nameStroke.Parent = nameLabel
 
 		local epsLabel = Instance.new("TextLabel")
 		epsLabel.Size = UDim2.new(1, -6, 0.5, 0)
 		epsLabel.Position = UDim2.new(0, 3, 0.5, 0)
 		epsLabel.BackgroundTransparency = 1
 		epsLabel.Text = "$" .. characterData.earningsPerSecond .. "/s"
-		epsLabel.TextColor3 = Color3.fromRGB(0, 255, 127)
+		epsLabel.TextColor3 = Color3.fromRGB(150, 255, 150) -- Light green
 		epsLabel.TextScaled = true
 		epsLabel.Font = Enum.Font.Gotham
 		epsLabel.Parent = frame
+		
+		-- Add text stroke
+		local epsStroke = Instance.new("UIStroke")
+		epsStroke.Color = Color3.fromRGB(0, 0, 0)
+		epsStroke.Thickness = 2
+		epsStroke.Parent = epsLabel
 	end
 
 	model.Parent = workspace

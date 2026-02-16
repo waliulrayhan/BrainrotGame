@@ -12,8 +12,8 @@ local UIConfig = require(ReplicatedStorage.Shared.Config.UIConfig)
 local ShopLaneService = {}
 
 local LanePath
-local SpawnInterval = 3 -- Seconds between spawns
-local MoveDuration = 15 -- Seconds to cross the lane
+local SpawnInterval = 5 -- Seconds between spawns
+local MoveDuration = 30 -- Seconds to cross the lane (slower for better readability)
 
 -- Performance: Use single loop for all characters instead of 50 separate Heartbeat connections
 local ActiveCharacters = {}
@@ -209,16 +209,16 @@ function ShopLaneService.CreateCharacterModel(characterData)
 		local frame = Instance.new("Frame")
 		frame.Size = UDim2.new(1, 0, 1, 0)
 		
-		-- Color based on tier
+		-- Color based on tier (Darker, more readable colors)
 		local tierColors = {
-			Color3.fromRGB(100, 100, 100), -- Tier 1: Gray
-			Color3.fromRGB(50, 150, 50),   -- Tier 2: Green
-			Color3.fromRGB(50, 100, 200),  -- Tier 3: Blue
-			Color3.fromRGB(200, 120, 0),   -- Tier 4: Orange
-			Color3.fromRGB(150, 0, 150),   -- Tier 5: Purple
+			Color3.fromRGB(80, 100, 120),   -- Tier 1: Dark Blue-Gray
+			Color3.fromRGB(60, 160, 100),   -- Tier 2: Dark Mint Green
+			Color3.fromRGB(30, 100, 200),   -- Tier 3: Deep Blue
+			Color3.fromRGB(130, 60, 200),   -- Tier 4: Deep Purple
+			Color3.fromRGB(220, 100, 60),   -- Tier 5: Deep Coral
 		}
 		frame.BackgroundColor3 = tierColors[characterData.tier] or UIConfig.Colors.Primary
-		frame.BackgroundTransparency = 0.2
+		frame.BackgroundTransparency = 0 -- Fully opaque for readability
 		frame.BorderSizePixel = 0
 		frame.Parent = billboard
 
@@ -232,10 +232,16 @@ function ShopLaneService.CreateCharacterModel(characterData)
 		nameLabel.Position = UDim2.new(0, 3, 0, 2)
 		nameLabel.BackgroundTransparency = 1
 		nameLabel.Text = characterData.name
-		nameLabel.TextColor3 = UIConfig.Colors.Text
+		nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- Pure white
 		nameLabel.TextScaled = true
 		nameLabel.Font = UIConfig.Fonts.Header
 		nameLabel.Parent = frame
+		
+		-- Add strong text stroke for readability
+		local nameStroke = Instance.new("UIStroke")
+		nameStroke.Color = Color3.fromRGB(0, 0, 0)
+		nameStroke.Thickness = 3
+		nameStroke.Parent = nameLabel
 
 		-- Price
 		local priceLabel = Instance.new("TextLabel")
@@ -243,10 +249,16 @@ function ShopLaneService.CreateCharacterModel(characterData)
 		priceLabel.Position = UDim2.new(0, 3, 0, 22)
 		priceLabel.BackgroundTransparency = 1
 		priceLabel.Text = UIConfig.FormatMoney(characterData.price)
-		priceLabel.TextColor3 = UIConfig.Colors.Success
+		priceLabel.TextColor3 = Color3.fromRGB(255, 255, 100) -- Bright yellow for visibility
 		priceLabel.TextScaled = true
 		priceLabel.Font = UIConfig.Fonts.Money
 		priceLabel.Parent = frame
+		
+		-- Add text stroke
+		local priceStroke = Instance.new("UIStroke")
+		priceStroke.Color = Color3.fromRGB(0, 0, 0)
+		priceStroke.Thickness = 3
+		priceStroke.Parent = priceLabel
 
 		-- EPS
 		local epsLabel = Instance.new("TextLabel")
@@ -254,10 +266,16 @@ function ShopLaneService.CreateCharacterModel(characterData)
 		epsLabel.Position = UDim2.new(0, 3, 0, 42)
 		epsLabel.BackgroundTransparency = 1
 		epsLabel.Text = UIConfig.FormatEPS(characterData.earningsPerSecond)
-		epsLabel.TextColor3 = UIConfig.Colors.Accent
+		epsLabel.TextColor3 = Color3.fromRGB(150, 255, 150) -- Light green for earnings
 		epsLabel.TextScaled = true
 		epsLabel.Font = UIConfig.Fonts.Body
 		epsLabel.Parent = frame
+		
+		-- Add text stroke
+		local epsStroke = Instance.new("UIStroke")
+		epsStroke.Color = Color3.fromRGB(0, 0, 0)
+		epsStroke.Thickness = 2
+		epsStroke.Parent = epsLabel
 	end
 
 	model.Parent = workspace
