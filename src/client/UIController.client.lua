@@ -145,11 +145,19 @@ function UIController.ShowToast(type: string, message: string)
 		notificationsFrame = Instance.new("Frame")
 		notificationsFrame.Name = "Notifications"
 		notificationsFrame.Size = UDim2.new(1, 0, 1, 0)
+		notificationsFrame.Position = UDim2.new(0, 0, 0, 0) -- Full screen from top-left
 		notificationsFrame.BackgroundTransparency = 1
 		notificationsFrame.ZIndex = 10
 		notificationsFrame.Parent = mainHud
 		notifications = notificationsFrame -- Cache it
 		print("[UIController] Created Notifications frame")
+	end
+	
+	-- Ensure the notifications frame has correct properties (in case it was created manually)
+	if notificationsFrame then
+		notificationsFrame.Size = UDim2.new(1, 0, 1, 0)
+		notificationsFrame.Position = UDim2.new(0, 0, 0, 0)
+		notificationsFrame.BackgroundTransparency = 1
 	end
 	
 	-- Final check
@@ -160,7 +168,8 @@ function UIController.ShowToast(type: string, message: string)
 	
 	local toast = Instance.new("Frame")
 	toast.Size = UDim2.new(0, 350, 0, UIConfig.Toast.Height)
-	toast.Position = UDim2.new(0.5, -175, 0, -100) -- Start off screen
+	toast.Position = UDim2.new(0.5, 0, 1, 100) -- Start off screen at bottom
+	toast.AnchorPoint = Vector2.new(0.5, 0) -- Center horizontally
 	toast.BackgroundColor3 = if type == "success"
 		then UIConfig.Toast.SuccessColor
 		elseif type == "error" then UIConfig.Toast.ErrorColor
@@ -198,10 +207,11 @@ function UIController.ShowToast(type: string, message: string)
 	textStroke.Parent = label
 
 	-- Slide in with bounce
+	-- Use scale positioning (0.85 = 85% from top, or 15% from bottom)
 	local slideIn = TweenService:Create(
 		toast,
 		TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-		{ Position = UDim2.new(0.5, -175, 0, 30) }
+		{ Position = UDim2.new(0.5, 0, 0.85, 0) }
 	)
 
 	slideIn:Play()
@@ -214,7 +224,7 @@ function UIController.ShowToast(type: string, message: string)
 	local slideOut = TweenService:Create(
 		toast,
 		TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-		{ Position = UDim2.new(0.5, -175, 0, -100) }
+		{ Position = UDim2.new(0.5, 0, 1, 100) }
 	)
 
 	slideOut:Play()
