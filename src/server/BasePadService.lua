@@ -369,13 +369,16 @@ function BasePadService.GetPlayerEarnersForSave(player: Player)
 	for tier, characters in pairs(BasePadCharacters) do
 		for _, character in ipairs(characters) do
 			if character.owner == player.UserId then
-				-- Only save the character ID, not the model or other non-serializable data
+				-- Save character ID and EPS (needed for offline earnings calculation)
 				table.insert(earnerData, {
 					id = character.id,
+					eps = character.eps, -- IMPORTANT: needed for offline earnings
 				})
 			end
 		end
 	end
+	
+	print("[BasePadService] Saving", #earnerData, "earners for", player.Name, "with total EPS:", BasePadService.GetPlayerTotalEPS(player))
 
 	return earnerData
 end

@@ -13,14 +13,21 @@ local PlayerDataStore = DataStoreService:GetDataStore("PlayerData_v1")
 
 local CurrencyService
 local BaseService
+local UpgradeService
 
 local AutoSaveInterval = 120 -- Save every 2 minutes
 local MaxRetries = 3
 local RetryDelay = 0.5
 
-function SavingService.Initialize(currencyService, baseService)
+-- Offline earnings settings
+local OFFLINE_EARNINGS_PERCENTAGE = 0.5 -- 50% of potential earnings
+local MAX_OFFLINE_HOURS = 12 -- Cap at 12 hours
+local MIN_OFFLINE_SECONDS = 10 -- Minimum 10 seconds away (lowered for testing)
+
+function SavingService.Initialize(currencyService, baseService, upgradeService)
 	CurrencyService = currencyService
 	BaseService = baseService
+	UpgradeService = upgradeService
 
 	-- Start auto-save loop
 	SavingService.StartAutoSave()
@@ -39,6 +46,16 @@ function SavingService.LoadPlayerData(player: Player)
 
 	if success and data then
 		print("[SavingService] ✓ Loaded data for", player.Name, "- Balance:", data.Balance, "Unclaimed:", data.Unclaimed, "Earners:", data.Earners and #data.Earners or 0)
+		
+		-- Calculate offline earnings if player was away
+		if data.LastLogout then
+			local offlineEarnings = SavingService.CalculateOfflineEarnings(player, data)
+			if offlineEarnings > 0 then
+				data.OfflineEarnings = offlineEarnings
+				data.OfflineTime = os.time() - data.LastLogout
+			end
+		end
+		
 		return data
 	elseif success then
 		print("[SavingService] No saved data for", player.Name, "- New player")
@@ -49,17 +66,77 @@ function SavingService.LoadPlayerData(player: Player)
 	end
 end
 
+-- Calculate offline earnings based on time away
+function SavingService.CalculateOfflineEarnings(player: Player, savedData): number
+	if not savedData.LastLogout then
+		return 0
+	end
+	
+	if not savedData.Earners or #savedData.Earners == 0 then
+		return 0
+	end
+	
+	local currentTime = os.time()
+	local offlineTimeSeconds = currentTime - savedData.LastLogout
+	
+	-- Cap at maximum offline hours
+	local maxOfflineSeconds = MAX_OFFLINE_HOURS * 3600
+	if offlineTimeSeconds > maxOfflineSeconds then
+		offlineTimeSeconds = maxOfflineSeconds
+	end
+	
+	-- Must be away for at least MIN_OFFLINE_SECONDS to get offline earnings
+	if offlineTimeSeconds < MIN_OFFLINE_SECONDS then
+		return 0
+	end
+	
+	-- Calculate base EPS from saved earners
+	local totalEPS = 0
+	for _, earner in ipairs(savedData.Earners) do
+		local earnerEPS = earner.eps or 0
+		totalEPS = totalEPS + earnerEPS
+	end
+	
+	if totalEPS <= 0 then
+		return 0
+	end
+	
+	-- Apply delivery speed multiplier if available
+	local deliveryMultiplier = 1
+	if savedData.Upgrades and savedData.Upgrades.DeliverySpeed then
+		local ReplicatedStorage = game:GetService("ReplicatedStorage")
+		local UpgradeConfig = require(ReplicatedStorage.Shared.Config.UpgradeConfig)
+		local levelData = UpgradeConfig.GetLevelData("DeliverySpeed", savedData.Upgrades.DeliverySpeed)
+		if levelData then
+			deliveryMultiplier = levelData.multiplier
+		end
+	end
+	
+	-- Calculate potential earnings (with delivery multiplier)
+	local potentialEarnings = totalEPS * deliveryMultiplier * offlineTimeSeconds
+	
+	-- Apply offline percentage (50% by default)
+	local offlineEarnings = math.floor(potentialEarnings * OFFLINE_EARNINGS_PERCENTAGE)
+	
+	return offlineEarnings
+end
+
 -- Save player data to DataStore
 function SavingService.SavePlayerData(player: Player)
 	local userId = player.UserId
 	local key = "Player_" .. userId
 
+	print("[SavingService] ==============================")
+	print("[SavingService] Saving data for:", player.Name)
+
 	-- Gather data from services
 	local currencyData = CurrencyService.GetPlayerData(player)
 	local earners = BaseService.GetPlayerEarners(player)
+	local upgrades = UpgradeService and UpgradeService.GetPlayerUpgrades(player)
 
 	if not currencyData then
 		warn("[SavingService] No currency data to save for", player.Name)
+		print("[SavingService] ==============================")
 		return false
 	end
 
@@ -67,12 +144,26 @@ function SavingService.SavePlayerData(player: Player)
 		Balance = currencyData.Balance,
 		Unclaimed = currencyData.Unclaimed,
 		Earners = earners,
+		Upgrades = upgrades,
 		HasSeenTutorial = true, -- Always save as true after first play
 		LastSave = os.time(),
+		LastLogout = os.time(), -- Save logout time for offline earnings
 	}
 
 	-- Debug: Print what we're saving
-	print("[SavingService] Saving for", player.Name, "- Balance:", dataToSave.Balance, "Unclaimed:", dataToSave.Unclaimed, "Earners:", #earners)
+	print("[SavingService] Data to save:")
+	print("  - Balance:", dataToSave.Balance)
+	print("  - Unclaimed:", dataToSave.Unclaimed)
+	print("  - Earners:", #earners, "characters")
+	if #earners > 0 then
+		local totalSavedEPS = 0
+		for _, e in ipairs(earners) do
+			totalSavedEPS = totalSavedEPS + (e.eps or 0)
+		end
+		print("  - Total EPS being saved:", totalSavedEPS)
+	end
+	print("  - Upgrades:", upgrades)
+	print("  - LastLogout:", dataToSave.LastLogout)
 
 	local success = SavingService.RetryOperation(function()
 		PlayerDataStore:SetAsync(key, dataToSave)
@@ -81,11 +172,11 @@ function SavingService.SavePlayerData(player: Player)
 
 	if success then
 		print("[SavingService] ✓ Successfully saved data for", player.Name)
-		return true
 	else
 		warn("[SavingService] ✗ Failed to save data for", player.Name)
-		return false
 	end
+	print("[SavingService] ==============================")
+	return success
 end
 
 -- Retry operation with exponential backoff

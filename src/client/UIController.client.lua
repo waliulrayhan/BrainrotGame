@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local UIConfig = require(ReplicatedStorage.Shared.Config.UIConfig)
+local UpgradeConfig = require(ReplicatedStorage.Shared.Config.UpgradeConfig)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -24,6 +25,12 @@ local ShowTutorialEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild(
 local TutorialCompletedEvent = ReplicatedStorage:WaitForChild("Shared")
 	:WaitForChild("Remotes")
 	:WaitForChild("TutorialCompleted")
+
+-- Upgrade & Offline Earnings Events
+local UpgradeUpdateEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("UpgradeUpdate")
+local RequestUpgradeEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("RequestUpgrade")
+local ShowOfflineEarningsEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("ShowOfflineEarnings")
+local ClaimOfflineEarningsEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("ClaimOfflineEarnings")
 
 -- UI Elements (wait longer for UI to be created)
 local mainHud = playerGui:WaitForChild("MainHUD", 30) -- Wait up to 30 seconds
@@ -42,6 +49,14 @@ local currentBalance = 0
 local currentUnclaimed = 0
 local displayBalance = 0
 local displayUnclaimed = 0
+
+-- Upgrade state
+local playerUpgrades = {
+	ClaimMultiplier = 1,
+	DeliverySpeed = 1,
+}
+
+local upgradeScreenGui = nil
 
 local UIController = {}
 
@@ -391,8 +406,374 @@ function UIController.ShowTutorial()
 	panelIn:Play()
 end
 
+-- Show Upgrade UI
+function UIController.ShowUpgradeUI()
+	-- Don't create multiple upgrade UIs
+	if upgradeScreenGui then
+		upgradeScreenGui:Destroy()
+	end
+	
+	print("[UIController] Showing upgrade UI")
+	
+	-- Create ScreenGui container
+	upgradeScreenGui = Instance.new("ScreenGui")
+	upgradeScreenGui.Name = "UpgradeScreenGui"
+	upgradeScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	upgradeScreenGui.DisplayOrder = 100
+	upgradeScreenGui.ResetOnSpawn = false
+	upgradeScreenGui.IgnoreGuiInset = true
+	upgradeScreenGui.Parent = playerGui
+	
+	-- Full-screen overlay
+	local overlay = Instance.new("Frame")
+	overlay.Name = "UpgradeOverlay"
+	overlay.Size = UDim2.new(1, 0, 1, 0)
+	overlay.Position = UDim2.new(0, 0, 0, 0)
+	overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	overlay.BackgroundTransparency = 0.6
+	overlay.BorderSizePixel = 0
+	overlay.Parent = upgradeScreenGui
+	
+	-- Upgrade panel
+	local panel = Instance.new("Frame")
+	panel.Name = "UpgradePanel"
+	panel.Size = UDim2.new(0, 500, 0, 400)
+	panel.Position = UDim2.new(0.5, -250, 0.5, -200)
+	panel.BackgroundColor3 = UIConfig.Colors.DarkBackground
+	panel.BorderSizePixel = 0
+	panel.Parent = overlay
+	
+	local panelCorner = Instance.new("UICorner")
+	panelCorner.CornerRadius = UDim.new(0, 15)
+	panelCorner.Parent = panel
+	
+	local panelStroke = Instance.new("UIStroke")
+	panelStroke.Color = UIConfig.Colors.Primary
+	panelStroke.Thickness = 3
+	panelStroke.Transparency = 0.3
+	panelStroke.Parent = panel
+	
+	-- Title
+	local title = Instance.new("TextLabel")
+	title.Name = "Title"
+	title.Size = UDim2.new(1, -40, 0, 60)
+	title.Position = UDim2.new(0, 20, 0, 10)
+	title.BackgroundTransparency = 1
+	title.Text = "⚡ UPGRADES"
+	title.TextColor3 = UIConfig.Colors.Primary
+	title.TextSize = 32
+	title.Font = UIConfig.Fonts.Header
+	title.TextXAlignment = Enum.TextXAlignment.Center
+	title.Parent = panel
+	
+	-- Close button
+	local closeButton = Instance.new("TextButton")
+	closeButton.Name = "CloseButton"
+	closeButton.Size = UDim2.new(0, 40, 0, 40)
+	closeButton.Position = UDim2.new(1, -55, 0, 10)
+	closeButton.BackgroundColor3 = UIConfig.Colors.Danger
+	closeButton.Text = "X"
+	closeButton.TextColor3 = Color3.new(1, 1, 1)
+	closeButton.TextSize = 24
+	closeButton.Font = Enum.Font.GothamBold
+	closeButton.BorderSizePixel = 0
+	closeButton.ZIndex = 10
+	closeButton.Parent = panel
+	
+	local closeCorner = Instance.new("UICorner")
+	closeCorner.CornerRadius = UDim.new(0, 8)
+	closeCorner.Parent = closeButton
+	
+	closeButton.MouseButton1Click:Connect(function()
+		upgradeScreenGui:Destroy()
+		upgradeScreenGui = nil
+	end)
+	
+	-- Upgrade list
+	local listFrame = Instance.new("Frame")
+	listFrame.Name = "ListFrame"
+	listFrame.Size = UDim2.new(1, -40, 1, -100)
+	listFrame.Position = UDim2.new(0, 20, 0, 80)
+	listFrame.BackgroundTransparency = 1
+	listFrame.Parent = panel
+	
+	local listLayout = Instance.new("UIListLayout")
+	listLayout.Padding = UDim.new(0, 15)
+	listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	listLayout.Parent = listFrame
+	
+	-- Create upgrade items
+	for _, upgradeId in ipairs({"ClaimMultiplier", "DeliverySpeed"}) do
+		UIController.CreateUpgradeItem(listFrame, upgradeId)
+	end
+	
+	-- Animate in
+	panel.Size = UDim2.new(0, 0, 0, 0)
+	panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	
+	local panelIn = TweenService:Create(
+		panel,
+		TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{ Size = UDim2.new(0, 500, 0, 400), Position = UDim2.new(0.5, -250, 0.5, -200) }
+	)
+	
+	panelIn:Play()
+end
+
+-- Create an upgrade item in the list
+function UIController.CreateUpgradeItem(parent, upgradeId)
+	local upgradeData = UpgradeConfig.GetUpgrade(upgradeId)
+	if not upgradeData then return end
+	
+	local currentLevel = playerUpgrades[upgradeId] or 1
+	local currentLevelData = UpgradeConfig.GetLevelData(upgradeId, currentLevel)
+	local nextLevelData = UpgradeConfig.GetNextLevelData(upgradeId, currentLevel)
+	local isMaxLevel = UpgradeConfig.IsMaxLevel(upgradeId, currentLevel)
+	
+	local item = Instance.new("Frame")
+	item.Name = upgradeId
+	item.Size = UDim2.new(1, 0, 0, 120)
+	item.BackgroundColor3 = UIConfig.Colors.MediumBackground
+	item.BorderSizePixel = 0
+	item.Parent = parent
+	
+	local itemCorner = Instance.new("UICorner")
+	itemCorner.CornerRadius = UDim.new(0, 10)
+	itemCorner.Parent = item
+	
+	-- Icon & Name
+	local nameLabel = Instance.new("TextLabel")
+	nameLabel.Size = UDim2.new(1, -20, 0, 30)
+	nameLabel.Position = UDim2.new(0, 10, 0, 10)
+	nameLabel.BackgroundTransparency = 1
+	nameLabel.Text = upgradeData.icon .. " " .. upgradeData.name
+	nameLabel.TextColor3 = UIConfig.Colors.Text
+	nameLabel.TextSize = 22
+	nameLabel.Font = UIConfig.Fonts.Header
+	nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	nameLabel.Parent = item
+	
+	-- Level display
+	local levelLabel = Instance.new("TextLabel")
+	levelLabel.Size = UDim2.new(1, -20, 0, 20)
+	levelLabel.Position = UDim2.new(0, 10, 0, 45)
+	levelLabel.BackgroundTransparency = 1
+	levelLabel.Text = "Level " .. currentLevel .. "/" .. upgradeData.maxLevel
+	levelLabel.TextColor3 = UIConfig.Colors.TextDim
+	levelLabel.TextSize = 16
+	levelLabel.Font = UIConfig.Fonts.Body
+	levelLabel.TextXAlignment = Enum.TextXAlignment.Left
+	levelLabel.Parent = item
+	
+	-- Effect description
+	local effectLabel = Instance.new("TextLabel")
+	effectLabel.Size = UDim2.new(1, -20, 0, 20)
+	effectLabel.Position = UDim2.new(0, 10, 0, 68)
+	effectLabel.BackgroundTransparency = 1
+	
+	if isMaxLevel then
+		effectLabel.Text = "MAX LEVEL - " .. currentLevelData.description
+		effectLabel.TextColor3 = UIConfig.Colors.Success
+	else
+		effectLabel.Text = "Next: " .. nextLevelData.description
+		effectLabel.TextColor3 = UIConfig.Colors.Accent
+	end
+	
+	effectLabel.TextSize = 15
+	effectLabel.Font = UIConfig.Fonts.Body
+	effectLabel.TextXAlignment = Enum.TextXAlignment.Left
+	effectLabel.Parent = item
+	
+	-- Upgrade button
+	if not isMaxLevel then
+		local upgradeButton = Instance.new("TextButton")
+		upgradeButton.Size = UDim2.new(0, 180, 0, 35)
+		upgradeButton.Position = UDim2.new(1, -190, 1, -43)
+		upgradeButton.BackgroundColor3 = UIConfig.Colors.Primary
+		upgradeButton.Text = "UPGRADE - " .. UIConfig.FormatMoney(nextLevelData.cost)
+		upgradeButton.TextColor3 = Color3.new(1, 1, 1)
+		upgradeButton.TextSize = 16
+		upgradeButton.Font = UIConfig.Fonts.Button
+		upgradeButton.BorderSizePixel = 0
+		upgradeButton.Parent = item
+		
+		local buttonCorner = Instance.new("UICorner")
+		buttonCorner.CornerRadius = UDim.new(0, 8)
+		buttonCorner.Parent = upgradeButton
+		
+		-- Debounce to prevent double-clicking
+		local debounce = false
+		upgradeButton.MouseButton1Click:Connect(function()
+			if debounce then
+				return
+			end
+			
+			debounce = true
+			RequestUpgradeEvent:FireServer(upgradeId)
+			
+			-- Reset debounce after 1 second
+			task.delay(1, function()
+				debounce = false
+			end)
+		end)
+	end
+end
+
+-- Show Offline Earnings Welcome Back Screen
+function UIController.ShowOfflineEarnings(amount, timeAwaySeconds)
+	
+	-- Format time away
+	local hours = math.floor(timeAwaySeconds / 3600)
+	local minutes = math.floor((timeAwaySeconds % 3600) / 60)
+	local timeText = string.format("%dh %dm", hours, minutes)
+	
+	-- Create ScreenGui
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "OfflineEarningsGui"
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.DisplayOrder = 150
+	screenGui.ResetOnSpawn = false
+	screenGui.IgnoreGuiInset = true
+	screenGui.Parent = playerGui
+	
+	-- Overlay
+	local overlay = Instance.new("Frame")
+	overlay.Size = UDim2.new(1, 0, 1, 0)
+	overlay.Position = UDim2.new(0, 0, 0, 0)
+	overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	overlay.BackgroundTransparency = 0.7
+	overlay.BorderSizePixel = 0
+	overlay.Parent = screenGui
+	
+	-- Welcome panel
+	local panel = Instance.new("Frame")
+	panel.Name = "WelcomePanel"
+	panel.Size = UDim2.new(0, 450, 0, 320)
+	panel.Position = UDim2.new(0.5, -225, 0.5, -160)
+	panel.BackgroundColor3 = UIConfig.Colors.DarkBackground
+	panel.BorderSizePixel = 0
+	panel.Parent = overlay
+	
+	local panelCorner = Instance.new("UICorner")
+	panelCorner.CornerRadius = UDim.new(0, 20)
+	panelCorner.Parent = panel
+	
+	local panelStroke = Instance.new("UIStroke")
+	panelStroke.Color = UIConfig.Colors.Success
+	panelStroke.Thickness = 4
+	panelStroke.Transparency = 0.2
+	panelStroke.Parent = panel
+	
+	-- Title
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, -40, 0, 60)
+	title.Position = UDim2.new(0, 20, 0, 20)
+	title.BackgroundTransparency = 1
+	title.Text = "🎉 WELCOME BACK! 🎉"
+	title.TextColor3 = UIConfig.Colors.Success
+	title.TextSize = 30
+	title.Font = UIConfig.Fonts.Header
+	title.TextXAlignment = Enum.TextXAlignment.Center
+	title.Parent = panel
+	
+	-- Time away label
+	local timeLabel = Instance.new("TextLabel")
+	timeLabel.Size = UDim2.new(1, -40, 0, 30)
+	timeLabel.Position = UDim2.new(0, 20, 0, 90)
+	timeLabel.BackgroundTransparency = 1
+	timeLabel.Text = "You were away for: " .. timeText
+	timeLabel.TextColor3 = UIConfig.Colors.TextDim
+	timeLabel.TextSize = 18
+	timeLabel.Font = UIConfig.Fonts.Body
+	timeLabel.TextXAlignment = Enum.TextXAlignment.Center
+	timeLabel.Parent = panel
+	
+	-- Earnings label
+	local earningsTitle = Instance.new("TextLabel")
+	earningsTitle.Size = UDim2.new(1, -40, 0, 25)
+	earningsTitle.Position = UDim2.new(0, 20, 0, 135)
+	earningsTitle.BackgroundTransparency = 1
+	earningsTitle.Text = "Your characters earned:"
+	earningsTitle.TextColor3 = UIConfig.Colors.Text
+	earningsTitle.TextSize = 16
+	earningsTitle.Font = UIConfig.Fonts.Body
+	earningsTitle.TextXAlignment = Enum.TextXAlignment.Center
+	earningsTitle.Parent = panel
+	
+	-- Money amount
+	local amountLabel = Instance.new("TextLabel")
+	amountLabel.Size = UDim2.new(1, -40, 0, 50)
+	amountLabel.Position = UDim2.new(0, 20, 0, 165)
+	amountLabel.BackgroundTransparency = 1
+	amountLabel.Text = UIConfig.FormatMoney(amount)
+	amountLabel.TextColor3 = UIConfig.Colors.MoneyGold
+	amountLabel.TextSize = 38
+	amountLabel.Font = UIConfig.Fonts.Money
+	amountLabel.TextXAlignment = Enum.TextXAlignment.Center
+	amountLabel.Parent = panel
+	
+	-- Claim button
+	local claimBtn = Instance.new("TextButton")
+	claimBtn.Size = UDim2.new(0, 280, 0, 50)
+	claimBtn.Position = UDim2.new(0.5, -140, 1, -70)
+	claimBtn.BackgroundColor3 = UIConfig.Colors.Success
+	claimBtn.Text = "CLAIM OFFLINE EARNINGS"
+	claimBtn.TextColor3 = Color3.new(1, 1, 1)
+	claimBtn.TextSize = 20
+	claimBtn.Font = UIConfig.Fonts.Button
+	claimBtn.BorderSizePixel = 0
+	claimBtn.Parent = panel
+	
+	local btnCorner = Instance.new("UICorner")
+	btnCorner.CornerRadius = UDim.new(0, 12)
+	btnCorner.Parent = claimBtn
+	
+	claimBtn.MouseButton1Click:Connect(function()
+		-- Send claim request to server (server will add to balance)
+		ClaimOfflineEarningsEvent:FireServer()
+		
+		-- Show success toast
+		UIController.ShowToast("success", "Claimed " .. UIConfig.FormatMoney(amount) .. "!")
+		
+		-- Close the UI
+		local fadeOut = TweenService:Create(
+			overlay,
+			TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{ BackgroundTransparency = 1 }
+		)
+		local panelOut = TweenService:Create(
+			panel,
+			TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+			{ Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0) }
+		)
+		
+		fadeOut:Play()
+		panelOut:Play()
+		
+		panelOut.Completed:Wait()
+		screenGui:Destroy()
+	end)
+	
+	-- Animate in
+	panel.Size = UDim2.new(0, 0, 0, 0)
+	panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+	
+	local panelIn = TweenService:Create(
+		panel,
+		TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+		{ Size = UDim2.new(0, 450, 0, 320), Position = UDim2.new(0.5, -225, 0.5, -160) }
+	)
+	
+	panelIn:Play()
+end
+
 -- Initialize controller
 function UIController.Initialize()
+	print("[UIController] Starting initialization...")
+	print("[UIController] mainHud:", mainHud)
+	print("[UIController] claimButton:", claimButton)
+	print("[UIController] claimSection:", claimSection)
+	
 	if not mainHud or not claimButton then
 		print("[UIController] UI not created yet - characters will still spawn!")
 		print("[UIController] Create MainHUD in StarterGui to see the UI")
@@ -422,6 +803,9 @@ function UIController.Initialize()
 	claimButton.MouseButton1Click:Connect(function()
 		UIController.OnClaimClicked()
 	end)
+	
+	-- Create Upgrade button next to claim button
+	UIController.CreateUpgradeButton()
 
 	-- Setup character clicking
 	UIController.SetupCharacterClicking()
@@ -436,6 +820,59 @@ function UIController.Initialize()
 	-- The server will send StateUpdate when it initializes the player
 
 	print("[UIController] Initialized")
+end
+
+-- Create the Upgrade button in the UI
+function UIController.CreateUpgradeButton()
+	if not mainHud then 
+		warn("[UIController] MainHUD not found - cannot create upgrade button")
+		return 
+	end
+	
+	-- Don't create if already exists
+	if mainHud:FindFirstChild("UpgradeButton") then
+		print("[UIController] Upgrade button already exists")
+		return
+	end
+	
+	-- Create Upgrade button (placed at top-right of screen for visibility)
+	local upgradeButton = Instance.new("TextButton")
+	upgradeButton.Name = "UpgradeButton"
+	upgradeButton.Size = UDim2.new(0, 180, 0, 55)
+	-- Position at top-right corner
+	upgradeButton.Position = UDim2.new(1, -200, 0, 80)
+	upgradeButton.AnchorPoint = Vector2.new(0, 0)
+	upgradeButton.BackgroundColor3 = UIConfig.Colors.Primary
+	upgradeButton.Text = "⚡ UPGRADES"
+	upgradeButton.TextColor3 = Color3.new(1, 1, 1)
+	upgradeButton.TextSize = 22
+	upgradeButton.Font = UIConfig.Fonts.Button
+	upgradeButton.BorderSizePixel = 0
+	upgradeButton.ZIndex = 5
+	upgradeButton.Parent = mainHud
+	
+	local upgradeCorner = Instance.new("UICorner")
+	upgradeCorner.CornerRadius = UDim.new(0, 12)
+	upgradeCorner.Parent = upgradeButton
+	
+	local upgradeStroke = Instance.new("UIStroke")
+	upgradeStroke.Color = Color3.fromRGB(255, 255, 255)
+	upgradeStroke.Thickness = 2
+	upgradeStroke.Transparency = 0.7
+	upgradeStroke.Parent = upgradeButton
+	
+	upgradeButton.MouseButton1Click:Connect(function()
+		UIController.ShowUpgradeUI()
+		
+		-- Animate button click
+		local originalSize = upgradeButton.Size
+		local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, true)
+		local tween = TweenService:Create(upgradeButton, tweenInfo, { 
+			Size = UDim2.new(originalSize.X.Scale * 1.05, originalSize.X.Offset * 1.05, 
+				originalSize.Y.Scale * 1.05, originalSize.Y.Offset * 1.05) 
+		})
+		tween:Play()
+	end)
 end
 
 -- Handle state updates from server
@@ -477,6 +914,21 @@ end)
 -- Handle tutorial show request from server
 ShowTutorialEvent.OnClientEvent:Connect(function()
 	UIController.ShowTutorial()
+end)
+
+-- Handle upgrade updates from server
+UpgradeUpdateEvent.OnClientEvent:Connect(function(upgrades)
+	playerUpgrades = upgrades
+	
+	-- Refresh upgrade UI if it's open
+	if upgradeScreenGui then
+		UIController.ShowUpgradeUI()
+	end
+end)
+
+-- Handle offline earnings from server
+ShowOfflineEarningsEvent.OnClientEvent:Connect(function(amount, timeAwaySeconds)
+	UIController.ShowOfflineEarnings(amount, timeAwaySeconds)
 end)
 
 -- Initialize

@@ -15,9 +15,11 @@ local BasePadService = require(Services:WaitForChild("BasePadService"))
 local BaseService = {}
 
 local CurrencyService
+local UpgradeService
 
-function BaseService.Initialize(currencyService)
+function BaseService.Initialize(currencyService, upgradeService)
 	CurrencyService = currencyService
+	UpgradeService = upgradeService -- Store reference for delivery speed multiplier
 
 	-- Initialize basepads
 	BasePadService.Initialize()
@@ -74,6 +76,7 @@ end
 -- Earning loop - runs every second
 function BaseService.StartEarningLoop()
 	local lastUpdate = os.time()
+	local logCounter = 0 -- Only log every 10 seconds to avoid spam
 
 	RunService.Heartbeat:Connect(function()
 		local now = os.time()
@@ -81,14 +84,32 @@ function BaseService.StartEarningLoop()
 		-- Run every 1 second
 		if now - lastUpdate >= 1 then
 			lastUpdate = now
+			logCounter = logCounter + 1
 
 			-- Process earnings for all players
 			for _, player in Players:GetPlayers() do
 				local eps = BaseService.GetTotalEPS(player)
 
 				if eps > 0 then
-					CurrencyService.AddUnclaimed(player, eps)
+					-- Apply delivery speed multiplier from upgrades
+					local multiplier = 1
+					if UpgradeService then
+						multiplier = UpgradeService.GetDeliveryMultiplier(player)
+					end
+					
+					local actualEPS = eps * multiplier
+					
+					-- Log every 10 seconds to avoid spam
+					if logCounter >= 10 then
+						print("[BaseService] Earning tick for", player.Name, "- Base EPS:", eps, "Multiplier:", multiplier, "Actual EPS:", actualEPS)
+					end
+					
+					CurrencyService.AddUnclaimed(player, actualEPS)
 				end
+			end
+			
+			if logCounter >= 10 then
+				logCounter = 0
 			end
 		end
 	end)
