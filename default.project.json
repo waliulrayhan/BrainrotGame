@@ -46,6 +46,9 @@
           "$className": "Folder",
           "UIController": {
             "$path": "src/client/UIController.client.lua"
+          },
+          "CharacterFilter": {
+            "$path": "src/client/CharacterFilter.client.lua"
           }
         }
       }

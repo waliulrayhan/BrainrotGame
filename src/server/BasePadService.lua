@@ -126,7 +126,7 @@ function BasePadService.CreateCharacterModel(characterData, tier: number, player
 	end
 
 	-- Position on the basepad - arrange characters in a grid
-	local position = BasePadService.GetNextCharacterPosition(tier, basePad)
+	local position = BasePadService.GetNextCharacterPosition(tier, basePad, player)
 	if model.PrimaryPart then
 		model:SetPrimaryPartCFrame(CFrame.new(position))
 	end
@@ -221,7 +221,7 @@ function BasePadService.CreateOrMoveCharacterModel(characterData, tier: number, 
 	end
 
 	-- Get the target position on the basepad
-	local targetPosition = BasePadService.GetNextCharacterPosition(tier, basePad)
+	local targetPosition = BasePadService.GetNextCharacterPosition(tier, basePad, player)
 
 	-- If we have an existing model from the shop lane, move it
 	if existingModel then
@@ -314,9 +314,18 @@ function BasePadService.CreateOrMoveCharacterModel(characterData, tier: number, 
 end
 
 -- Get the next position for a character on a basepad (grid layout)
-function BasePadService.GetNextCharacterPosition(tier: number, basePad: BasePart): Vector3
+function BasePadService.GetNextCharacterPosition(tier: number, basePad: BasePart, player: Player): Vector3
 	local charactersOnPad = BasePadCharacters[tier] or {}
-	local count = #charactersOnPad
+	
+	-- Count only this player's characters on this tier
+	local playerCharacterCount = 0
+	for _, character in ipairs(charactersOnPad) do
+		if character.owner == player.UserId then
+			playerCharacterCount = playerCharacterCount + 1
+		end
+	end
+	
+	local count = playerCharacterCount
 
 	-- Arrange in rows of 4
 	local spacing = 5
