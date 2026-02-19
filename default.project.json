@@ -27,6 +27,18 @@
           },
           "TutorialCompleted": {
             "$className": "RemoteEvent"
+          },
+          "UpgradeUpdate": {
+            "$className": "RemoteEvent"
+          },
+          "RequestUpgrade": {
+            "$className": "RemoteEvent"
+          },
+          "ShowOfflineEarnings": {
+            "$className": "RemoteEvent"
+          },
+          "ClaimOfflineEarnings": {
+            "$className": "RemoteEvent"
           }
         }
       }

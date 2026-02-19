@@ -6,10 +6,25 @@
 
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 local SavingService = {}
 
-local PlayerDataStore = DataStoreService:GetDataStore("PlayerData_v1")
+-- Safely try to get DataStore (will fail in Studio if not published)
+local PlayerDataStore
+local DataStoreEnabled = true
+
+local success, result = pcall(function()
+	return DataStoreService:GetDataStore("PlayerData_v1")
+end)
+
+if success then
+	PlayerDataStore = result
+	print("[SavingService] DataStore connected successfully")
+else
+	DataStoreEnabled = false
+	warn("[SavingService] DataStore not available (Studio unpublished game) - Data will not persist!")
+end
 
 local CurrencyService
 local BaseService
@@ -37,6 +52,11 @@ end
 
 -- Load player data from DataStore
 function SavingService.LoadPlayerData(player: Player)
+	if not DataStoreEnabled then
+		warn("[SavingService] DataStore disabled - returning nil for", player.Name)
+		return nil
+	end
+
 	local userId = player.UserId
 	local key = "Player_" .. userId
 
@@ -45,8 +65,17 @@ function SavingService.LoadPlayerData(player: Player)
 	end)
 
 	if success and data then
-		print("[SavingService] ✓ Loaded data for", player.Name, "- Balance:", data.Balance, "Unclaimed:", data.Unclaimed, "Earners:", data.Earners and #data.Earners or 0)
-		
+		print(
+			"[SavingService] ✓ Loaded data for",
+			player.Name,
+			"- Balance:",
+			data.Balance,
+			"Unclaimed:",
+			data.Unclaimed,
+			"Earners:",
+			data.Earners and #data.Earners or 0
+		)
+
 		-- Calculate offline earnings if player was away
 		if data.LastLogout then
 			local offlineEarnings = SavingService.CalculateOfflineEarnings(player, data)
@@ -55,7 +84,7 @@ function SavingService.LoadPlayerData(player: Player)
 				data.OfflineTime = os.time() - data.LastLogout
 			end
 		end
-		
+
 		return data
 	elseif success then
 		print("[SavingService] No saved data for", player.Name, "- New player")
@@ -71,36 +100,36 @@ function SavingService.CalculateOfflineEarnings(player: Player, savedData): numb
 	if not savedData.LastLogout then
 		return 0
 	end
-	
+
 	if not savedData.Earners or #savedData.Earners == 0 then
 		return 0
 	end
-	
+
 	local currentTime = os.time()
 	local offlineTimeSeconds = currentTime - savedData.LastLogout
-	
+
 	-- Cap at maximum offline hours
 	local maxOfflineSeconds = MAX_OFFLINE_HOURS * 3600
 	if offlineTimeSeconds > maxOfflineSeconds then
 		offlineTimeSeconds = maxOfflineSeconds
 	end
-	
+
 	-- Must be away for at least MIN_OFFLINE_SECONDS to get offline earnings
 	if offlineTimeSeconds < MIN_OFFLINE_SECONDS then
 		return 0
 	end
-	
+
 	-- Calculate base EPS from saved earners
 	local totalEPS = 0
 	for _, earner in ipairs(savedData.Earners) do
 		local earnerEPS = earner.eps or 0
 		totalEPS = totalEPS + earnerEPS
 	end
-	
+
 	if totalEPS <= 0 then
 		return 0
 	end
-	
+
 	-- Apply delivery speed multiplier if available
 	local deliveryMultiplier = 1
 	if savedData.Upgrades and savedData.Upgrades.DeliverySpeed then
@@ -111,18 +140,23 @@ function SavingService.CalculateOfflineEarnings(player: Player, savedData): numb
 			deliveryMultiplier = levelData.multiplier
 		end
 	end
-	
+
 	-- Calculate potential earnings (with delivery multiplier)
 	local potentialEarnings = totalEPS * deliveryMultiplier * offlineTimeSeconds
-	
+
 	-- Apply offline percentage (50% by default)
 	local offlineEarnings = math.floor(potentialEarnings * OFFLINE_EARNINGS_PERCENTAGE)
-	
+
 	return offlineEarnings
 end
 
 -- Save player data to DataStore
 function SavingService.SavePlayerData(player: Player)
+	if not DataStoreEnabled then
+		warn("[SavingService] DataStore disabled - skipping save for", player.Name)
+		return true -- Return true to avoid error spam
+	end
+
 	local userId = player.UserId
 	local key = "Player_" .. userId
 
