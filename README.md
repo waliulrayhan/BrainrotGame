@@ -116,7 +116,7 @@ Download and install these in order:
 ### **Step 9: Play the Game!**
 
 1. In Roblox Studio, press **F5**
-2. **Boom! Enjoy the game!** 🎉
+2. **Boom! Enjoy the game!**
 
 ### **Gameplay Quick Guide:**
 - Walk to the **green PurchaseZone**
@@ -128,7 +128,7 @@ Download and install these in order:
 
 ---
 
-## 📊 Character Tiers & Strategy
+## Character Tiers & Strategy
 
 ### **Character Tiers:**
 | Tier | Name | Cost | Earnings/Second |
@@ -171,126 +171,60 @@ Download and install these in order:
 
 ---
 
-## 🛠️ Troubleshooting
-
-### **"aftman --version" or "rojo --version" not working?**
-- Make sure you **closed all terminals** after editing PATH
-- Restart VS Code completely
-- Verify PATH was added correctly in Environment Variables
-- Check that `C:\aftman` and `C:\rojo` folders exist and contain the executables
-
-### **Rojo won't connect in Studio?**
-- Make sure `rojo serve` is **running** in VS Code terminal (you should see "Rojo server listening...")
-- Check that Rojo plugin is **installed** in Studio (**Plugins → Manage Plugins**)
-- Try port 34872 is not blocked by firewall
-- Close Studio and VS Code, then restart both
-
-### **Characters don't spawn?**
-- Check **Output window** (View → Output) for errors
-- Make sure you're standing **inside the green PurchaseZone**
-- Verify you have enough money to buy the character
-
-### **Can't buy characters?**
-- Stand **inside the green PurchaseZone** (the green transparent platform)
-- Make sure you have **enough money**
-- Click **directly on the character** (colored cube moving in shop lane)
-
-### **UI doesn't show?**
-- Press **Shift+F5** to stop, then **F5** to restart
-- Check that `BrainrotGame-Template.rbxl` was opened correctly
-- Verify `MainHUD` exists in **StarterGui** in the Explorer
-
-### **Data not saving?**
-- Data only saves in **published games** or **Local Server** test mode
-- In Studio single-player mode, data won't persist (this is normal)
-
-### **Git clone fails?**
-- Verify Git is installed: `git --version`
-- Check your internet connection
-- Make sure the GitHub URL is correct
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 BrainrotGame/
-├── BrainrotGame-Template.rbxl   # ⭐ Pre-built game file (open & play!)
-├── src/                         # Source code (syncs via Rojo)
-│   ├── MainServer.server.lua    # Server entry point
-│   ├── server/                  # Server services (7 files)
-│   │   ├── BasePadService.lua   # Basepad management
-│   │   ├── BaseService.lua      # Earnings system
-│   │   ├── CurrencyService.lua  # Money management
-│   │   ├── PurchaseService.lua  # Purchase validation
-│   │   ├── SavingService.lua    # DataStore + offline earnings
-│   │   ├── ShopLaneService.lua  # Shop spawning
-│   │   └── TutorialService.lua  # Tutorial system
-│   ├── client/                  # Client scripts (2 files)
+├── BrainrotGame-Template.rbxl            # Pre-built game file (open & play!)
+├── src/                                  # Source code (syncs via Rojo)
+│   ├── MainServer.server.lua             # Server entry point
+│   ├── server/                           # Server services (7 files)
+│   │   ├── BasePadService.lua            # Basepad management
+│   │   ├── BaseService.lua               # Earnings system
+│   │   ├── CurrencyService.lua           # Money management
+│   │   ├── PurchaseService.lua           # Purchase validation
+│   │   ├── SavingService.lua             # DataStore + offline earnings
+│   │   ├── ShopLaneService.lua           # Shop spawning
+│   │   └── TutorialService.lua           # Tutorial system
+│   ├── client/                           # Client scripts (2 files)
 │   │   ├── UIController.client.lua       # UI updates
 │   │   └── CharacterFilter.client.lua    # Multiplayer filtering (not implemented yet)
-│   └── shared/Config/           # Configuration (3 files)
-│       ├── CharacterConfig.lua  # Character tiers (5 tiers)
-│       ├── UIConfig.lua         # UI styling
-│       └── UpgradeConfig.lua    # Upgrade levels (2 upgrades)
-├── docs/                        # Detailed documentation
-├── default.project.json         # Rojo configuration
-├── aftman.toml                  # Tool versions
-├── selene.toml                  # Linter config
-├── stylua.toml                  # Formatter config
-└── README.md                    # This file
+│   └── shared/Config/                    # Configuration (3 files)
+│       ├── CharacterConfig.lua           # Character tiers (5 tiers)
+│       ├── UIConfig.lua                  # UI styling
+│       └── UpgradeConfig.lua             # Upgrade levels (2 upgrades)
+├── docs/                                 # Detailed documentation
+├── default.project.json                  # Rojo configuration
+├── aftman.toml                           # Tool versions
+├── selene.toml                           # Linter config
+├── stylua.toml                           # Formatter config
+└── README.md                             # This file
 ```
 
 ---
 
-## 🎮 Game Features (v1.1)
+## Game Features (v1.1)
 
-- ✅ **5-Tier Character System** - Free starter → $3,500 legendary (Tiny → Legend Brainrot)
-- ✅ **Dual Upgrade System** - Claim Multiplier (2.5x) + Delivery Speed (7x)
-- ✅ **6 Upgrade Levels** - Each upgrade has 6 levels ($0 → $600,000)
-- ✅ **Offline Earnings** - Earn 50% while away (12 hour cap)
-- ✅ **Auto-Save System** - DataStore saves every 2 minutes + on leave
-- ✅ **Multi-Player Ready** - Separate basepads & currency per player
-- ✅ **Weighted Character Spawning** - Rare characters spawn less often
-- ✅ **Anti-Exploit Protection** - Server-authoritative, 0.3s cooldown
-- ✅ **Tutorial System** - Automatic for new players
-- ✅ **Config-Driven Design** - Easy to add new characters/upgrades
-
----
-
-## 🚀 Publishing to Roblox
-
-Want to publish your game to Roblox?
-
-1. In Roblox Studio, click **File** → **Publish to Roblox**
-2. Choose **Create New Game** or update existing game
-3. Add game name, description, and icon
-4. Click **Publish**
-5. Share your game link with friends!
+- **5-Tier Character System** - Free starter → $3,500 legendary (Tiny → Legend Brainrot)
+- **Dual Upgrade System** - Claim Multiplier (2.5x) + Delivery Speed (7x)
+- **6 Upgrade Levels** - Each upgrade has 6 levels ($0 → $600,000)
+- **Offline Earnings** - Earn 50% while away (12 hour cap)
+- **Auto-Save System** - DataStore saves every 2 minutes + on leave
+- **Multi-Player Ready** - Separate basepads & currency per player
+- **Weighted Character Spawning** - Rare characters spawn less often
+- **Anti-Exploit Protection** - Server-authoritative, 0.3s cooldown
+- **Tutorial System** - Automatic for new players
+- **Config-Driven Design** - Easy to add new characters/upgrades
 
 ---
 
-## 📚 Additional Documentation
+## Contact & Support
 
-See [docs/](docs/) folder for detailed information:
-- **[PROJECT_HANDOVER.md](docs/PROJECT_HANDOVER.md)** - Complete technical overview
-- **[FEATURES_LIST.md](docs/FEATURES_LIST.md)** - All 12 features explained
-- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Service APIs & functions
-- **[TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Testing procedures
----
+**Developer:** Md. Waliul Islam Rayhan
 
-## 📞 Support
-
-**Issues?**
-1. Check **Output window** in Studio (View → Output)
-2. Read **[Troubleshooting](#-troubleshooting)** section above
-3. See [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) for testing help
-
----
-
-## 📄 License
-
-This project is open source. Feel free to learn from and modify it!
+- **GitHub:** [github.com/waliulrayhan](https://github.com/waliulrayhan)
+- **LinkedIn:** [linkedin.com/in/waliulrayhan](https://linkedin.com/in/waliulrayhan)
+- **Email:** [b190305034@cse.jnu.ac.bd](mailto:b190305034@cse.jnu.ac.bd)
 
 ---
 
