@@ -11,6 +11,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CurrencyService = {}
 
+-- Reference to UpgradeService (set during initialization)
+local UpgradeService
+
 -- Constants (prevent exploits and float drift)
 local MAX_CURRENCY = 1e15 -- 1 quadrillion maximum
 local MIN_CURRENCY = 0
@@ -28,7 +31,9 @@ local PlayerData = {}
 local StateUpdateEvent
 local PurchaseFeedbackEvent
 
-function CurrencyService.Initialize()
+function CurrencyService.Initialize(upgradeService)
+	UpgradeService = upgradeService -- Store reference for claim multiplier
+	
 	-- Get remote events
 	StateUpdateEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("StateUpdate")
 	PurchaseFeedbackEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Remotes"):WaitForChild("PurchaseFeedback")
@@ -89,7 +94,7 @@ function CurrencyService.AddUnclaimed(player: Player, amount: number)
 	CurrencyService.SyncPlayer(player)
 end
 
--- Claim unclaimed money (move to balance)
+-- Claim unclaimed money (move to balance) with upgrade multiplier
 function CurrencyService.ClaimMoney(player: Player): number
 	if not PlayerData[player.UserId] then
 		-- Send feedback even when player data doesn't exist
@@ -100,18 +105,33 @@ function CurrencyService.ClaimMoney(player: Player): number
 	local unclaimed = PlayerData[player.UserId].Unclaimed
 
 	if unclaimed > 0 then
-		PlayerData[player.UserId].Balance = ClampCurrency(PlayerData[player.UserId].Balance + unclaimed)
+		-- Apply claim multiplier from upgrades
+		local multiplier = 1
+		if UpgradeService then
+			multiplier = UpgradeService.GetClaimMultiplier(player)
+		end
+		
+		local claimedAmount = ClampCurrency(unclaimed * multiplier)
+		
+		PlayerData[player.UserId].Balance = ClampCurrency(PlayerData[player.UserId].Balance + claimedAmount)
 		PlayerData[player.UserId].Unclaimed = 0
+		
 		CurrencyService.SyncPlayer(player)
 
 		-- Send success feedback
-		PurchaseFeedbackEvent:FireClient(player, "success", "Claimed $" .. tostring(math.floor(unclaimed)) .. "!")
+		local message = "Claimed $" .. tostring(math.floor(claimedAmount)) .. "!"
+		if multiplier > 1 then
+			message = message .. " (" .. multiplier .. "x bonus!)"
+		end
+		PurchaseFeedbackEvent:FireClient(player, "success", message)
+		
+		return claimedAmount
 	else
 		-- Send info message when nothing to claim
 		PurchaseFeedbackEvent:FireClient(player, "error", "Nothing to claim yet!")
 	end
 
-	return unclaimed
+	return 0
 end
 
 -- Get player balance
