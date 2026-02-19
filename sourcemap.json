@@ -16,14 +16,14 @@
               "className": "Folder",
               "children": [
                 {
-                  "name": "CharacterConfig",
-                  "className": "ModuleScript",
-                  "filePaths": ["src/shared/Config/CharacterConfig.lua"]
-                },
-                {
                   "name": "UIConfig",
                   "className": "ModuleScript",
                   "filePaths": ["src/shared/Config/UIConfig.lua"]
+                },
+                {
+                  "name": "CharacterConfig",
+                  "className": "ModuleScript",
+                  "filePaths": ["src/shared/Config/CharacterConfig.lua"]
                 }
               ]
             },
@@ -34,8 +34,8 @@
                 { "name": "PurchaseFeedback", "className": "RemoteEvent" },
                 { "name": "RequestBuy", "className": "RemoteEvent" },
                 { "name": "RequestClaim", "className": "RemoteEvent" },
-                { "name": "ShowTutorial", "className": "RemoteEvent" },
                 { "name": "StateUpdate", "className": "RemoteEvent" },
+                { "name": "ShowTutorial", "className": "RemoteEvent" },
                 { "name": "TutorialCompleted", "className": "RemoteEvent" }
               ]
             }
@@ -57,11 +57,6 @@
           "className": "Folder",
           "children": [
             {
-              "name": "BasePadService",
-              "className": "ModuleScript",
-              "filePaths": ["src/server/BasePadService.lua"]
-            },
-            {
               "name": "BaseService",
               "className": "ModuleScript",
               "filePaths": ["src/server/BaseService.lua"]
@@ -72,19 +67,24 @@
               "filePaths": ["src/server/CurrencyService.lua"]
             },
             {
-              "name": "PurchaseService",
-              "className": "ModuleScript",
-              "filePaths": ["src/server/PurchaseService.lua"]
-            },
-            {
               "name": "SavingService",
               "className": "ModuleScript",
               "filePaths": ["src/server/SavingService.lua"]
             },
             {
+              "name": "PurchaseService",
+              "className": "ModuleScript",
+              "filePaths": ["src/server/PurchaseService.lua"]
+            },
+            {
               "name": "ShopLaneService",
               "className": "ModuleScript",
               "filePaths": ["src/server/ShopLaneService.lua"]
+            },
+            {
+              "name": "BasePadService",
+              "className": "ModuleScript",
+              "filePaths": ["src/server/BasePadService.lua"]
             },
             {
               "name": "TutorialService",
