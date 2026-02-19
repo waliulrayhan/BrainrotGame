@@ -1,620 +1,337 @@
-# 🎮 ULTIMATE UI SETUP GUIDE - BRAINROT GAME
-## Make Your Game Look AMAZING! 🌟
+# 🎮 BrainrotGame - Idle Progression Game
 
-This guide will help you create a **colorful, fun, and eye-catching UI** that kids will love! We'll make everything bright, bubbly, and exciting! 🎨
+An idle/tycoon game where you buy characters, place them on your basepad, and earn money automatically!
+
+**Version:** 1.1 | **Framework:** Rojo + Roblox Studio | **Status:** ✅ Production Ready
 
 ---
 
-## 🔄 **Quick Reset: Start Fresh with $0**
+## 🎯 What You Get
 
-If you're testing in Roblox Studio and want to reset your balance to $0:
+- 🛒 **5-Tier Character System** - Buy characters from $50 → $500,000
+- 📍 **Automatic Earnings** - Characters earn 1 → 30,000 per second
+- ⚡ **Upgrade System** - Permanent 2.5x claim + 7x speed multipliers
+- 💤 **Offline Earnings** - Get 50% while away (12hr cap)
+- 💾 **Auto-Save** - Everything persists via DataStore
+- 👥 **Multi-Player Ready** - Isolated basepads per player
 
-**Method 1: Stop and Restart Test**
-1. Stop your current test session
-2. Click **"Server & Clients"** from the test mode dropdown
-3. Start the test - you'll have $0 balance
+---
 
-**Method 2: Clear DataStore (Command Bar)**
-1. Stop your test
-2. Open the **Command Bar** (View → Command Bar)
-3. Paste this command:
-```lua
-game:GetService("DataStoreService"):GetDataStore("PlayerData_v1"):RemoveAsync("Player_" .. game.Players.LocalPlayer.UserId)
+## ⚡ Quick Start (For Players)
+
+### **1. Clone Repository**
+```powershell
+git clone https://github.com/waliulrayhan/BrainrotGame.git
+cd BrainrotGame
 ```
-4. Press Enter
-5. Restart your test
 
-**Method 3: Fresh Start for Everyone**
-- Ask a developer to change `PlayerData_v1` to `PlayerData_v2` in SavingService.lua
-- This creates a new DataStore where everyone starts fresh
+### **2. Open Pre-Built Template**
+```powershell
+# Just open the template file:
+start BrainrotGame-Template.rbxlx
+```
 
----
+### **3. Play!**
+- Press **F5** in Roblox Studio
+- **That's it!** 🎉 Everything is ready!
 
-## 🎯 What We're Building
-
-A super cool game interface with:
-- 💰 **Money Display** - Show your cash in BIG colorful numbers!
-- ⏰ **Earnings Counter** - Watch your money grow with animations!
-- 🎁 **Claim Button** - Huge, glowing button that pulses!
-- 🎊 **Toast Notifications** - Pop-up messages that slide in with confetti!
-- ✨ **Gradient Backgrounds** - Rainbow colors everywhere!
+**No manual setup needed** - Workspace, UI, everything is pre-configured!
 
 ---
 
-## 📐 STEP 1: Create MainHUD (Container)
+## 🛠️ For Developers (Live Code Editing)
 
-### 1.1 Create the ScreenGui
-1. Open **StarterGui** in Explorer
-2. Click the **+** button next to StarterGui
-3. Select **ScreenGui**
-4. **Rename it to:** `MainHUD`
+Want to modify the code and see changes instantly?
 
-### 1.2 Configure MainHUD
-Click on MainHUD and set these properties:
+### **Prerequisites**
+1. **Roblox Studio** - [Download here](https://www.roblox.com/create)
+2. **Git** - [Download here](https://git-scm.com/downloads)
+3. **Aftman** - Install via PowerShell:
+   ```powershell
+   irm https://raw.githubusercontent.com/LPGhatguy/aftman/main/installers/windows.ps1 | iex
+   ```
 
-| Property | Value |
-|----------|-------|
-| **Name** | MainHUD |
-| **ResetOnSpawn** | ❌ false |
-| **ZIndexBehavior** | Sibling |
-| **IgnoreGuiInset** | ✅ true |
+### **Setup Once**
+```powershell
+# Clone repo (if not already)
+git clone https://github.com/waliulrayhan/BrainrotGame.git
+cd BrainrotGame
 
----
+# Install tools
+aftman install
+```
 
-## 🌈 STEP 2: Create TopBar (Money Display Area)
+### **Development Workflow**
+```powershell
+# Terminal 1: Start Rojo server
+rojo serve
 
-### 2.1 Create TopBar Frame
-1. Right-click **MainHUD** → Insert Object → **Frame**
-2. **Rename to:** `TopBar`
+# Terminal 2: (Optional) Open VS Code
+code .
+```
 
-### 2.2 TopBar Properties
+**In Roblox Studio:**
+1. Open `BrainrotGame-Template.rbxlx`
+2. **Plugins** → **Rojo** → **Connect**
+3. ✅ Code syncs automatically from `src/` folder!
+4. Edit `.lua` files in VS Code → Changes appear in Studio instantly
 
-| Property | Value |
-|----------|-------|
-| **Name** | TopBar |
-| **Size** | `{1, 0},{0, 80}` |
-| **Position** | `{0, 0},{0, 0}` |
-| **BackgroundColor3** | RGB(30, 30, 40) - Dark blue-ish |
-| **BorderSizePixel** | 0 |
+**Recommended VS Code Extensions:**
+- **Roblox LSP** (by Nightrains)
+- **Luau Language Server** (by JohnnyMorganz)
+3. Click **Plugins** → **Rojo** → **Connect**
+4. Click **Connect** in the Rojo window
 
-### 2.3 Add Gradient to TopBar! 🌈
-1. Right-click **TopBar** → Insert Object → **UIGradient**
-2. Set these properties:
-
-| Property | Value |
-|----------|-------|
-| **Color** | ColorSequence: <br>• 0.0 → RGB(75, 0, 130) - Purple<br>• 0.5 → RGB(138, 43, 226) - Violet<br>• 1.0 → RGB(75, 0, 130) - Purple |
-| **Rotation** | 90 |
-
-**How to set ColorSequence:**
-1. Click Color property
-2. Click the small dots under the gradient bar to add keypoints
-3. Set 3 keypoints at positions 0, 0.5, and 1.0
-4. Click each keypoint and set the RGB values above
-
-### 2.4 Add Corner Rounding (Bottom only)
-1. Right-click **TopBar** → Insert Object → **UICorner**
-
-| Property | Value |
-|----------|-------|
-| **CornerRadius** | `0, 20` |
+You should see: "Connected to Rojo" + code appears in Explorer
 
 ---
 
-## 💰 STEP 3: Create BalanceLabel (Spendable Money)
+## 🏗️ World Setup (First Time Only)
 
-### 3.1 Create the Label
-1. Right-click **TopBar** → Insert Object → **Frame**
-2. **Rename to:** `BalanceContainer`
+Your code is ready, but you need to create the 3D world:
 
-### 3.2 BalanceContainer Properties
-
-| Property | Value |
-|----------|-------|
-| **Name** | BalanceContainer |
-| **Size** | `{0, 280},{0, 60}` |
-| **Position** | `{0, 20},{0, 10}` |
-| **BackgroundColor3** | RGB(255, 215, 0) - Gold |
-| **BorderSizePixel** | 0 |
-
-### 3.3 Add Gradient to Balance Container! ✨
-1. Insert **UIGradient** into BalanceContainer
-
-| Property | Value |
-|----------|-------|
-| **Color** | ColorSequence: <br>• 0.0 → RGB(255, 215, 0) - Gold<br>• 0.5 → RGB(255, 255, 100) - Light Yellow<br>• 1.0 → RGB(255, 215, 0) - Gold |
-| **Rotation** | 45 |
-
-### 3.4 Round the Corners
-1. Insert **UICorner** into BalanceContainer
-
-| Property | Value |
-|----------|-------|
-| **CornerRadius** | `0, 15` |
-
-### 3.5 Add Shadow Effect! 🌑
-1. Insert **UIStroke** into BalanceContainer
-
-| Property | Value |
-|----------|-------|
-| **Color** | RGB(0, 0, 0) - Black |
-| **Thickness** | 3 |
-| **Transparency** | 0.5 |
-
-### 3.6 Create BalanceLabel (Text)
-1. Right-click **BalanceContainer** → Insert Object → **TextLabel**
-2. **Rename to:** `BalanceLabel`
-
-### 3.7 BalanceLabel Properties
-
-| Property | Value |
-|----------|-------|
-| **Name** | BalanceLabel |
-| **Size** | `{1, -10},{1, -10}` |
-| **Position** | `{0, 5},{0, 5}` |
-| **BackgroundTransparency** | 1 |
-| **Text** | `Balance: $0` |
-| **TextColor3** | RGB(50, 25, 0) - Dark brown |
-| **TextSize** | 32 |
-| **Font** | GothamBold |
-| **TextXAlignment** | Left |
-| **TextYAlignment** | Center |
-
-### 3.8 Add Text Stroke for POP! 💥
-1. Insert **UIStroke** into BalanceLabel
-
-| Property | Value |
-|----------|-------|
-| **Color** | RGB(255, 255, 255) - White |
-| **Thickness** | 2 |
+### **Required Objects in Workspace:**
 
 ---
 
-## ⏰ STEP 4: Create UnclaimedLabel (Earnings Display)
+## ▶️ How to Play
 
-### 4.1 Create the Container
-1. Right-click **TopBar** → Insert Object → **Frame**
-2. **Rename to:** `UnclaimedContainer`
+**Press F5** in Roblox Studio and you're ready!
 
-### 4.2 UnclaimedContainer Properties
+### **Gameplay:**
+1. **Walk to the green PurchaseZone** (transparent green platform)
+2. **Click on moving characters** in the shop lane to buy them
+3. **Characters appear on basepads** and start earning automatically
+4. **Watch "Unclaimed" money grow** (top-right UI)
+5. **Click the big CLAIM button** (bottom) to collect earnings
+6. **Buy better characters** with your money!
 
-| Property | Value |
-|----------|-------|
-| **Name** | UnclaimedContainer |
-| **Size** | `{0, 280},{0, 60}` |
-| **Position** | `{1, -300},{0, 10}` |
-| **BackgroundColor3** | RGB(0, 255, 127) - Spring Green |
-| **BorderSizePixel** | 0 |
+### **Character Tiers:**
+| Tier | Cost | Earnings/Second | ROI |
+|------|------|-----------------|-----|
+| T1 | $50 | 1 EPS | 50s |
+| T2 | $500 | 15 EPS | 33s |
+| T3 | $5,000 | 200 EPS | 25s |
+| T4 | $50,000 | 2,500 EPS | 20s |
+| T5 | $500,000 | 30,000 EPS | 17s |
 
-### 4.3 Add Gradient! 🌟
-1. Insert **UIGradient** into UnclaimedContainer
+### **Upgrade Strategy:**
+1. **First $100k** → **Delivery Speed Level 2** (2x ALL earnings!)
+2. **Next $200k** → **Delivery Speed Level 3** (3x earnings)
+3. **Keep buying T3-T4** until you can afford T5
+4. **Late game** → Max Delivery Speed (7x) then Claim Multiplier (2.5x)
 
-| Property | Value |
-|----------|-------|
-| **Color** | ColorSequence: <br>• 0.0 → RGB(0, 255, 127) - Spring Green<br>• 0.5 → RGB(50, 255, 200) - Light Cyan<br>• 1.0 → RGB(0, 255, 127) - Spring Green |
-| **Rotation** | -45 |
-
-### 4.4 Round Corners
-1. Insert **UICorner** into UnclaimedContainer
-
-| Property | Value |
-|----------|-------|
-| **CornerRadius** | `0, 15` |
-
-### 4.5 Add Shadow! 🌑
-1. Insert **UIStroke** into UnclaimedContainer
-
-| Property | Value |
-|----------|-------|
-| **Color** | RGB(0, 0, 0) |
-| **Thickness** | 3 |
-| **Transparency** | 0.5 |
-
-### 4.6 Create UnclaimedLabel (Text)
-1. Right-click **UnclaimedContainer** → Insert Object → **TextLabel**
-2. **Rename to:** `UnclaimedLabel`
-
-### 4.7 UnclaimedLabel Properties
-
-| Property | Value |
-|----------|-------|
-| **Name** | UnclaimedLabel |
-| **Size** | `{1, -10},{1, -10}` |
-| **Position** | `{0, 5},{0, 5}` |
-| **BackgroundTransparency** | 1 |
-| **Text** | `Unclaimed: $0` |
-| **TextColor3** | RGB(0, 50, 25) - Dark green |
-| **TextSize** | 32 |
-| **Font** | GothamBold |
-| **TextXAlignment** | Right |
-| **TextYAlignment** | Center |
-
-### 4.8 Add Text Outline! 💫
-1. Insert **UIStroke** into UnclaimedLabel
-
-| Property | Value |
-|----------|-------|
-| **Color** | RGB(255, 255, 255) - White |
-| **Thickness** | 2 |
+### **Offline Earnings:**
+- Earn **50%** of potential earnings while offline (max 12 hours)
+- Always **claim before leaving** to save your money!
 
 ---
 
-## 🎁 STEP 5: Create ClaimSection (The BIG Button!)
+## 🛠️ Troubleshooting
 
-### 5.1 Create ClaimSection Frame
-1. Right-click **MainHUD** → Insert Object → **Frame**
-2. **Rename to:** `ClaimSection`
+### **Template file missing?**
+If you don't see `BrainrotGame-Template.rbxlx`:
+1. The maintainer needs to create it once (instructions in [docs/SETUP_TEMPLATE.md](docs/SETUP_TEMPLATE.md))
+2. Or use the legacy build: `rojo build -o BrainrotGame.rbxl` (requires manual setup)
 
-### 5.2 ClaimSection Properties
+### **Characters don't spawn?**
+- Check **Output window** (View → Output) for errors
+- Verify template file has **ShopLane → LanePath** in workspace
 
-| Property | Value |
-|----------|-------|
-| **Name** | ClaimSection |
-| **Size** | `{0, 280},{0, 120}` |
-| **Position** | `{0.5, -140},{1, -140}` |
-| **BackgroundTransparency** | 1 |
+### **Can't buy characters?**
+- Stand **inside the green PurchaseZone** (the green transparent platform)
+- Make sure you have **enough money**
+- Click **directly on the character** (colored cube)
 
-### 5.3 Create ClaimButton 🚀
-1. Right-click **ClaimSection** → Insert Object → **TextButton**
-2. **Rename to:** `ClaimButton`
+### **UI doesn't show?**
+- Template should have everything ready
+- Press **Shift+F5** to stop, then **F5** to restart
 
-### 5.4 ClaimButton Properties
+### **"Rojo command not found" (for developers)?**
+```powershell
+# Reinstall tools:
+aftman install
+```
 
-| Property | Value |
-|----------|-------|
-| **Name** | ClaimButton |
-| **Size** | `{1, 0},{0, 80}` |
-| **Position** | `{0, 0},{0, 0}` |
-| **BackgroundColor3** | RGB(255, 20, 147) - Deep Pink |
-| **Text** | `🎁 CLAIM! 🎁` |
-| **TextColor3** | RGB(255, 255, 255) - White |
-| **TextSize** | 42 |
-| **Font** | GothamBold |
-| **BorderSizePixel** | 0 |
-| **AutoButtonColor** | ✅ true |
-
-### 5.5 Add AWESOME Gradient! 🌈✨
-1. Insert **UIGradient** into ClaimButton
-
-| Property | Value |
-|----------|-------|
-| **Color** | ColorSequence: <br>• 0.0 → RGB(255, 0, 255) - Magenta<br>• 0.3 → RGB(255, 105, 180) - Hot Pink<br>• 0.6 → RGB(255, 20, 147) - Deep Pink<br>• 1.0 → RGB(255, 0, 255) - Magenta |
-| **Rotation** | 90 |
-
-### 5.6 Round Those Corners! 🔄
-1. Insert **UICorner** into ClaimButton
-
-| Property | Value |
-|----------|-------|
-| **CornerRadius** | `0, 20` |
-
-### 5.7 Add GLOWING Border! ✨💫
-1. Insert **UIStroke** into ClaimButton
-
-| Property | Value |
-|----------|-------|
-| **Color** | RGB(255, 255, 0) - Yellow |
-| **Thickness** | 4 |
-| **Transparency** | 0.3 |
-
-### 5.8 Add Button Shadow! 🌟
-1. Insert another **UIStroke** into ClaimButton (yes, add a second one!)
-
-| Property | Value |
-|----------|-------|
-| **ApplyStrokeMode** | Border |
-| **Color** | RGB(0, 0, 0) - Black |
-| **Thickness** | 6 |
-| **Transparency** | 0.7 |
-
-### 5.9 Make Text SPARKLE! ✨
-1. Insert **UIStroke** into ClaimButton's TextLabel
-
-| Property | Value |
-|----------|-------|
-| **Color** | RGB(255, 215, 0) - Gold |
-| **Thickness** | 3 |
+### **Need to modify workspace/UI?**
+See [docs/WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md) for detailed manual setup instructions.
 
 ---
 
-## 🎊 STEP 6: Create Notifications Area
-
-### 6.1 Create Notifications Frame
-1. Right-click **MainHUD** → Insert Object → **Frame**
-2. **Rename to:** `Notifications`
-
-### 6.2 Notifications Properties
-
-| Property | Value |
-|----------|-------|
-| **Name** | Notifications |
-| **Size** | `{1, 0},{0, 150}` |
-| **Position** | `{0, 0},{0, 100}` |
-| **BackgroundTransparency** | 1 |
-
----
-
-## 🎨 BONUS: Add Animated Background Pattern!
-
-### 7.1 Create Background Decoration
-1. Right-click **MainHUD** → Insert Object → **Frame**
-2. **Rename to:** `BackgroundPattern`
-3. **Move it to the TOP** of MainHUD's children (so it's behind everything)
-
-### 7.2 BackgroundPattern Properties
-
-| Property | Value |
-|----------|-------|
-| **Name** | BackgroundPattern |
-| **Size** | `{1, 0},{1, 0}` |
-| **Position** | `{0, 0},{0, 0}` |
-| **BackgroundColor3** | RGB(20, 20, 30) - Very dark blue |
-| **BorderSizePixel** | 0 |
-| **ZIndex** | -1 |
-
-### 7.3 Add Radial Gradient! 🌅
-1. Insert **UIGradient** into BackgroundPattern
-
-| Property | Value |
-|----------|-------|
-| **Color** | ColorSequence: <br>• 0.0 → RGB(40, 20, 60) - Dark Purple<br>• 0.5 → RGB(20, 20, 40) - Dark Blue<br>• 1.0 → RGB(10, 10, 20) - Almost Black |
-| **Rotation** | 0 |
-
----
-
-## ✨ STEP 7: Final Hierarchy Check
-
-Your Explorer should look like this:
+## 📁 Project Structure
 
 ```
-StarterGui
-└── MainHUD (ScreenGui)
-    ├── BackgroundPattern (Frame)
-    │   └── UIGradient
-    ├── TopBar (Frame)
-    │   ├── UIGradient
-    │   ├── UICorner
-    │   ├── BalanceContainer (Frame)
-    │   │   ├── UIGradient
-    │   │   ├── UICorner
-    │   │   ├── UIStroke
-    │   │   └── BalanceLabel (TextLabel)
-    │   │       └── UIStroke
-    │   └── UnclaimedContainer (Frame)
-    │       ├── UIGradient
-    │       ├── UICorner
-    │       ├── UIStroke
-    │       └── UnclaimedLabel (TextLabel)
-    │           └── UIStroke
-    ├── ClaimSection (Frame)
-    │   └── ClaimButton (TextButton)
-    │       ├── UIGradient
-    │       ├── UICorner
-    │       ├── UIStroke (x2 - border glow + shadow)
-    │       └── UIStroke (for text)
-    └── Notifications (Frame)
+BrainrotGame/
+├── BrainrotGame-Template.rbxlx  # ⭐ Pre-built game (just open & play!)
+├── src/                         # Source code (syncs via Rojo)
+│   ├── MainServer.server.lua    # Server entry point
+│   ├── server/                  # 7 server services
+│   │   ├── CurrencyService.lua
+│   │   ├── UpgradeService.lua
+│   │   ├── SavingService.lua
+│   │   └── ...
+│   ├── client/                  # 2 client scripts
+│   │   ├── UIController.client.lua
+│   │   └── CharacterFilter.client.lua
+│   └── shared/Config/           # 3 config files
+│       ├── CharacterConfig.lua
+│       ├── UpgradeConfig.lua
+│       └── UIConfig.lua
+├── docs/                        # Detailed documentation
+├── default.project.json         # Rojo configuration
+├── aftman.toml                 # Tool versions
+└── README.md                   # This file
 ```
 
 ---
 
-## 🎯 STEP 8: Test Your Amazing UI!
+## 🎮 Game Features (v1.1)
 
-### 8.1 Test in Studio
-1. Press **F5** to play
-2. You should see:
-   - ✨ **Purple gradient top bar**
-   - 💰 **Gold "Balance" display** (left side)
-   - ⏰ **Green "Unclaimed" display** (right side)
-   - 🎁 **HUGE pink "CLAIM" button** (bottom center)
-
-### 8.2 Check the Button Hover Effect
-- Hover over the CLAIM button
-- It should get slightly brighter (AutoButtonColor does this!)
+- ✅ **5-Tier Character System** - $50 starter → $500k legendary
+- ✅ **Upgrade System** - 2.5x claim + 7x speed multipliers
+- ✅ **Offline Earnings** - Earn 50% while away (12hr cap)
+- ✅ **Auto-Save** - DataStore saves every 2 minutes
+- ✅ **Multi-Player** - Separate basepads & money per player
+- ✅ **Character Filtering** - Only see your own characters
+- ✅ **Anti-Exploit** - Server-authoritative, cooldown protection
+- ✅ **Tutorial System** - Automatic for new players
 
 ---
 
-## 🌟 Color Scheme Summary
+## 🚀 Publishing to Roblox
 
-Here's the amazing color palette we used:
-
-| Element | Colors | Purpose |
-|---------|--------|---------|
-| **TopBar** | Purple to Violet gradient | Royal, magical feel |
-| **Balance** | Gold gradient | Money = valuable! |
-| **Unclaimed** | Spring green gradient | Growing earnings! |
-| **Claim Button** | Magenta/Pink gradient | Eye-catching, exciting! |
-| **Button Border** | Yellow glow | Makes it POP! |
-| **Background** | Dark purple/blue | Doesn't distract, makes colors stand out |
+1. Open `BrainrotGame-Template.rbxlx` in Studio
+2. **File** → **Publish to Roblox**
+3. Choose **Create New Game** or update existing
+4. Fill in details and publish
+5. Share the game link!
 
 ---
 
-## 🎮 What Happens When You Play?
+## 📚 Additional Documentation
 
-### Money Animations
-- **Balance** (💰) - Shows your spendable money
-  - Updates with smooth animations
-  - Gets bigger when you claim!
-
-- **Unclaimed** (⏰) - Shows your earned money
-  - Increases every second
-  - Pulses when it changes!
-
-### Claim Button
-- **Inactive** (no money): Pink gradient
-- **Active** (money to claim): Bright magenta + pulsing
-- **When clicked**: Button scales up slightly!
-
-### Toast Notifications
-- **Success** (green): "Bought Skibidi Starter!"
-- **Error** (red): "Not enough money!"
-- **Slide in from top** with smooth animation
+See [docs/](docs/) folder for:
+- **[PROJECT_HANDOVER.md](docs/PROJECT_HANDOVER.md)** - Complete technical overview
+- **[FEATURES_LIST.md](docs/FEATURES_LIST.md)** - All 12 features explained
+- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Service APIs
+- **[TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Testing procedures
+- **[WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md)** - Manual setup (if needed)
 
 ---
 
-## 🔥 Pro Tips for AMAZING UI
+### **UI doesn't show?**
+- Verify **MainHUD** exists in **StarterGui**
+- Check all UI elements created correctly
+- Press **Shift+F5** to stop, then **F5** to restart
 
-### 1. **Use Emojis!** 🎨
-- Makes everything more fun
-- Kids love visual icons
-- Use: 💰 ⏰ 🎁 ✨ 🌟 ⭐ 🎊 🎉
+### **"Rojo command not found"?**
+```powershell
+# Reinstall Aftman and tools:
+aftman install
+```
 
-### 2. **Gradients Everywhere!** 🌈
-- Single colors are boring
-- Gradients = depth and interest
-- Use 3-4 color stops for best effect
-
-### 3. **Rounded Corners!** ⭕
-- Sharp corners = old and boring
-- Round corners = modern and friendly
-- UICorner radius: 10-20 for buttons, 5-10 for containers
-
-### 4. **Shadows and Strokes!** 🌑
-- UIStroke for outlines
-- Multiple strokes for depth
-- Black strokes with transparency for shadows
-
-### 5. **Contrast is KEY!** ⚡
-- Light text on dark backgrounds
-- Dark text on light backgrounds
-- Use white strokes on text for readability
-
-### 6. **Animation Matters!** 🎬
-- The Lua code already animates money values
-- Buttons should respond to clicks
-- Toast notifications slide smoothly
+### **Data not saving in Studio?**
+- Use **"Local Server"** test mode (not single player)
+- Or publish to Roblox and test there
 
 ---
 
-## 🎨 Optional: Even MORE Customization!
+## 📁 Project Structure
 
-### Want to Change Colors?
-Edit these sections:
-
-**Purple Theme → Blue Theme:**
-- TopBar gradient: Use RGB(0, 150, 255) to RGB(0, 100, 200)
-
-**Gold → Silver:**
-- Balance gradient: Use RGB(192, 192, 192) to RGB(220, 220, 220)
-
-**Pink Button → Orange:**
-- Claim button: Use RGB(255, 140, 0) to RGB(255, 69, 0)
-
-### Want Bigger Text?
-- BalanceLabel TextSize: Try 36 or 40
-- UnclaimedLabel TextSize: Try 36 or 40
-- ClaimButton TextSize: Try 48 (HUGE!)
-
-### Want More Glow?
-- Add more UIStroke elements with different colors
-- Set Transparency to 0.5-0.8 for soft glow
-- Use bright colors: Yellow, Cyan, Magenta
-
----
-
-## ✅ Checklist - Did You Get Everything?
-
-- [ ] MainHUD created in StarterGui
-- [ ] TopBar with purple gradient
-- [ ] BalanceContainer with gold gradient
-- [ ] BalanceLabel with text stroke
-- [ ] UnclaimedContainer with green gradient
-- [ ] UnclaimedLabel with text stroke
-- [ ] ClaimSection created
-- [ ] ClaimButton with pink gradient
-- [ ] ClaimButton with glowing yellow border
-- [ ] Notifications frame for toasts
-- [ ] All UICorners for rounded edges
-- [ ] All UIStrokes for depth and glow
-- [ ] Background pattern with dark gradient
+```
+BrainrotGame/
+├── src/
+│   ├── MainServer.server.lua           # Server entry point
+│   ├── server/                         # Server services (7 files)
+│   │   ├── CurrencyService.lua         # Money management
+│   │   ├── UpgradeService.lua          # Upgrade system ⭐
+│   │   ├── SavingService.lua           # DataStore + offline earnings
+│   │   ├── BaseService.lua             # Earnings system
+│   │   ├── PurchaseService.lua         # Purchase validation
+│   │   ├── ShopLaneService.lua         # Shop spawning
+│   │   └── TutorialService.lua         # Tutorial system
+│   ├── client/                         # Client scripts (2 files)
+│   │   ├── UIController.client.lua     # UI updates
+│   │   └── CharacterFilter.client.lua  # Multiplayer filtering
+│   └── shared/Config/                  # Configuration (3 files)
+│       ├── CharacterConfig.lua         # Character tiers
+│       ├── UpgradeConfig.lua           # Upgrade levels
+│       └── UIConfig.lua                # UI styling
+├── default.project.json                # Rojo configuration
+├── aftman.toml                         # Tool versions
+├── build.bat                           # Build script (Windows)
+├── start.bat                           # Development server script
+├── README.md                           # This file
+└── docs/                               # Detailed documentation
+    ├── PROJECT_HANDOVER.md             # Technical handover
+    ├── API_REFERENCE.md                # Service APIs
+    ├── FEATURES_LIST.md                # Complete feature list
+    └── TESTING_GUIDE.md                # Testing procedures
+```
 
 ---
 
-## 🎉 CONGRATULATIONS!
+## 📚 Detailed Documentation
 
-You've created an **AMAZING, kid-friendly UI** that's:
-- ✨ **Colorful and eye-catching**
-- 🌈 **Full of gradients and effects**
-- 🎨 **Clean and easy to read**
-- 🎮 **Fun and exciting to use**
+For in-depth information, see the [docs/](docs/) folder:
 
-Kids will LOVE playing your game! 🎊
-
----
-
-## 🆘 Need Help?
-
-**Common Issues:**
-
-**Q: I don't see gradients!**
-- Make sure you added UIGradient as a **child** of the Frame/Button
-- Check that Color property has multiple keypoints (not just one)
-
-**Q: Text is too small!**
-- Increase TextSize property (try 36, 40, 48)
-- Use TextScaled = true for automatic sizing
-
-**Q: Colors look different!**
-- Make sure you're using RGB values (not HSV or Hex)
-- RGB values go from 0 to 255
-
-**Q: Button doesn't glow!**
-- Check UIStroke Thickness (try 3-5)
-- Check Transparency (should be 0.2-0.5 for glow)
-- Make sure UIStroke is a child of the button
-
-**Q: Everything is overlapping!**
-- Check ZIndex (higher numbers appear on top)
-- Background should have ZIndex = -1 or 0
-- Buttons should have ZIndex = 5 or higher
+- **[PROJECT_HANDOVER.md](docs/PROJECT_HANDOVER.md)** - Complete technical overview
+- **[FEATURES_LIST.md](docs/FEATURES_LIST.md)** - All 12 features explained
+- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - All service APIs
+- **[TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - How to test systems
+- **[CHANGELOG_v1.1.md](docs/CHANGELOG_v1.1.md)** - Version history
 
 ---
 
-## 🚀 What's Next?
+## 🎮 Game Features (v1.1)
 
-After building this UI:
-1. **Connect Rojo** to Studio
-2. **Build the 3D world** (ShopLane, PurchaseZone, Bases)
-3. **Press F5** to play!
-4. **Watch your UI come alive** with animations!
-
-The Lua code will make:
-- Money displays update smoothly
-- Button light up when you earn money
-- Toast notifications pop up
-- Everything animate beautifully!
+- ✅ **5-Tier Character System** - Free starter → $500k legendary
+- ✅ **Upgrade System** - 2.5x claim multiplier + 7x speed multiplier
+- ✅ **Offline Earnings** - Earn 50% while away (12hr cap)
+- ✅ **Auto-Save** - DataStore saves every 2 minutes
+- ✅ **Multi-Player** - Each player has separate basepads and money
+- ✅ **Character Filtering** - Only see your own characters
+- ✅ **Anti-Exploit** - Server-authoritative, 0.3s purchase cooldown
+- ✅ **Tutorial System** - Automatic for new players
+- ✅ **Toast Notifications** - Purchase feedback
 
 ---
 
-**NOW GO CREATE SOMETHING AMAZING!** 🎮✨🌟
+## 🔧 Development Commands
+
+```powershell
+# Start development server (live sync):
+rojo serve
+
+# Build place file:
+rojo build -o BrainrotGame.rbxl
+
+# Format code:
+stylua src/
+
+# Lint code:
+selene src/
+```
 
 ---
 
-## 📚 Quick Reference Card
+## 🚀 Publishing to Roblox
+---
 
-### Essential Properties to Remember:
+## 📞 Support
 
-**For Frames:**
-- Size: `{ScaleX, OffsetX},{ScaleY, OffsetY}`
-- Position: Same format as Size
-- BackgroundTransparency: 0 = solid, 1 = invisible
-
-**For Text:**
-- TextScaled: Auto-sizes text to fit
-- Font: GothamBold = chunky and fun
-- TextColor3: RGB(R, G, B) where each is 0-255
-
-**For Gradients:**
-- Color: Click to edit, add keypoints
-- Rotation: 0 = horizontal, 90 = vertical
-
-**For Corners:**
-- CornerRadius: `0, number` (higher = rounder)
-
-**For Strokes:**
-- Thickness: How thick the border is
-- Transparency: 0 = solid, 1 = invisible
-- Color: RGB(R, G, B)
+**Issues?**
+1. Check **Output window** in Studio (View → Output)
+2. Read **[Troubleshooting](#-troubleshooting)** section above
+3. See [docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md) for testing help
 
 ---
 
-**Made with ❤️ for young game developers! Keep creating! 🎨🎮**
+## 📄 License
+
+This project is open source. Feel free to learn from and modify it!
+
+---
+
+**Built with:** Rojo 7.4.4 | Roblox Studio | Lua/Luau  
+**Version:** 1.1 | **Last Updated:** February 20, 2026
