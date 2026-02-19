@@ -1,125 +1,169 @@
-# 🎮 BrainrotGame - Idle Progression Game
+# BrainrotGame - Idle Progression Game
 
 An idle/tycoon game where you buy characters, place them on your basepad, and earn money automatically!
 
-**Version:** 1.1 | **Framework:** Rojo + Roblox Studio | **Status:** ✅ Production Ready
+**Version:** 1.1 | **Framework:** Rojo + Roblox Studio
 
 ---
 
-## 🎯 What You Get
+## What You Get
 
-- 🛒 **5-Tier Character System** - Buy characters from $50 → $500,000
-- 📍 **Automatic Earnings** - Characters earn 1 → 30,000 per second
-- ⚡ **Upgrade System** - Permanent 2.5x claim + 7x speed multipliers
-- 💤 **Offline Earnings** - Get 50% while away (12hr cap)
-- 💾 **Auto-Save** - Everything persists via DataStore
-- 👥 **Multi-Player Ready** - Isolated basepads per player
-
----
-
-## ⚡ Quick Start (For Players)
-
-### **1. Clone Repository**
-```powershell
-git clone https://github.com/waliulrayhan/BrainrotGame.git
-cd BrainrotGame
-```
-
-### **2. Open Pre-Built Template**
-```powershell
-# Just open the template file:
-start BrainrotGame-Template.rbxlx
-```
-
-### **3. Play!**
-- Press **F5** in Roblox Studio
-- **That's it!** 🎉 Everything is ready!
-
-**No manual setup needed** - Workspace, UI, everything is pre-configured!
+- **5-Tier Character System** - Buy characters from $0 (free starter) → $3,500
+- **Automatic Earnings** - Characters earn 1 → 120 per second
+- **Upgrade System** - 2.5x claim multiplier + 7x speed multiplier (6 levels each)
+- **Offline Earnings** - Get 50% while away (12hr cap)
+- **Auto-Save** - Everything persists via DataStore
+- **Multi-Player Ready** - Isolated basepads per player
 
 ---
 
-## 🛠️ For Developers (Live Code Editing)
+## Complete Setup Guide (From Zero to Play)
 
-Want to modify the code and see changes instantly?
+Follow these steps in order to set up and run the game:
 
-### **Prerequisites**
+### **Step 1: Download and Install Required Software**
+
+Download and install these in order:
+
 1. **Roblox Studio** - [Download here](https://www.roblox.com/create)
-2. **Git** - [Download here](https://git-scm.com/downloads)
-3. **Aftman** - Install via PowerShell:
+   - If you don't have a Roblox account, create one or login
+
+2. **VS Code** - [Download here](https://code.visualstudio.com/)
+   - Install with default settings
+
+3. **Git** - [Download here](https://git-scm.com/downloads)
+   - Install with default settings
+
+### **Step 2: Download Aftman and Rojo**
+
+1. **Download Aftman:**
+   - Go to: https://github.com/LPGhatguy/aftman/releases/tag/v0.3.0
+   - Download the Windows version
+   - Extract to `C:\aftman`
+
+2. **Download Rojo:**
+   - Go to: https://github.com/rojo-rbx/rojo/releases/tag/v7.6.1
+   - Download `rojo.exe` for Windows
+   - Place it in `C:\rojo`
+
+### **Step 3: Add to System PATH**
+
+1. Press **Windows Key** and search **"Edit environment variables"**
+2. Click **"Edit the system environment variables"**
+3. Click **"Environment Variables"** button
+
+**For System Variables:**
+- Find **"Path"** → Click **"Edit"**
+- Click **"New"** → Type `C:\aftman` → Press Enter
+- Click **"New"** → Type `C:\rojo` → Press Enter
+- Click **"OK"**
+
+**For User Variables:**
+- Find **"Path"** → Click **"Edit"**
+- Click **"New"** → Type `C:\aftman` → Press Enter
+- Click **"New"** → Type `C:\rojo` → Press Enter
+- Click **"OK"**
+
+4. Click **"OK"** on all windows
+
+### **Step 4: Verify Installation**
+
+1. **Close all open terminals and command prompts**
+2. Open a **new PowerShell** window
+3. Run these commands:
    ```powershell
-   irm https://raw.githubusercontent.com/LPGhatguy/aftman/main/installers/windows.ps1 | iex
+   aftman --version
+   rojo --version
    ```
+4. If you see version numbers, installation is successful!
 
-### **Setup Once**
-```powershell
-# Clone repo (if not already)
-git clone https://github.com/waliulrayhan/BrainrotGame.git
-cd BrainrotGame
+### **Step 5: Clone Project from GitHub**
 
-# Install tools
-aftman install
-```
+1. Open **VS Code**
+2. Press **Ctrl + Shift + P**
+3. Type **"Git: Clone"** and press Enter
+4. Paste: `https://github.com/waliulrayhan/BrainrotGame.git`
+5. Choose a folder to save the project
+6. Click **"Open"** when prompted
 
-### **Development Workflow**
-```powershell
-# Terminal 1: Start Rojo server
-rojo serve
+### **Step 6: Open in Roblox Studio**
 
-# Terminal 2: (Optional) Open VS Code
-code .
-```
+1. In the project folder, find `BrainrotGame-Template.rbxl`
+2. **Double-click** the file (it will open in Roblox Studio automatically)
 
-**In Roblox Studio:**
-1. Open `BrainrotGame-Template.rbxlx`
-2. **Plugins** → **Rojo** → **Connect**
-3. ✅ Code syncs automatically from `src/` folder!
-4. Edit `.lua` files in VS Code → Changes appear in Studio instantly
+### **Step 7: Install Rojo Plugin in Studio**
 
-**Recommended VS Code Extensions:**
-- **Roblox LSP** (by Nightrains)
-- **Luau Language Server** (by JohnnyMorganz)
-3. Click **Plugins** → **Rojo** → **Connect**
-4. Click **Connect** in the Rojo window
+1. In Roblox Studio, click **"Plugins"** tab
+2. Click **"Manage Plugins"**
+3. Click the **"+"** (Add) icon
+4. Search for **"Rojo"**
+5. Click **"Install"** on the official Rojo plugin
+6. Close the plugins window
 
-You should see: "Connected to Rojo" + code appears in Explorer
+### **Step 8: Connect VS Code to Roblox Studio**
+
+1. In **VS Code**, open a new terminal (**Ctrl + `**)
+2. Run this command:
+   ```powershell
+   rojo serve
+   ```
+3. You should see: `Rojo server listening on port 34872`
+
+4. In **Roblox Studio**, click **"Plugins"** → **"Rojo"** → **"Connect"**
+5. Click **"Connect"** in the Rojo popup
+6. Wait for "Connected successfully!" message
+
+### **Step 9: Play the Game!**
+
+1. In Roblox Studio, press **F5**
+2. **Boom! Enjoy the game!** 🎉
+
+### **Gameplay Quick Guide:**
+- Walk to the **green PurchaseZone**
+- Click on **moving characters** to buy them
+- They spawn on your basepad and earn money automatically
+- Watch your **"Unclaimed"** money grow
+- Click the big **"CLAIM"** button to collect earnings
+- Buy better characters with your money!
 
 ---
 
-## 🏗️ World Setup (First Time Only)
-
-Your code is ready, but you need to create the 3D world:
-
-### **Required Objects in Workspace:**
-
----
-
-## ▶️ How to Play
-
-**Press F5** in Roblox Studio and you're ready!
-
-### **Gameplay:**
-1. **Walk to the green PurchaseZone** (transparent green platform)
-2. **Click on moving characters** in the shop lane to buy them
-3. **Characters appear on basepads** and start earning automatically
-4. **Watch "Unclaimed" money grow** (top-right UI)
-5. **Click the big CLAIM button** (bottom) to collect earnings
-6. **Buy better characters** with your money!
+## 📊 Character Tiers & Strategy
 
 ### **Character Tiers:**
-| Tier | Cost | Earnings/Second | ROI |
-|------|------|-----------------|-----|
-| T1 | $50 | 1 EPS | 50s |
-| T2 | $500 | 15 EPS | 33s |
-| T3 | $5,000 | 200 EPS | 25s |
-| T4 | $50,000 | 2,500 EPS | 20s |
-| T5 | $500,000 | 30,000 EPS | 17s |
+| Tier | Name | Cost | Earnings/Second |
+|------|------|------|------------------|
+| T1 | Tiny Brainrot | $0 (Free) | 1 EPS |
+| T2 | Better Brainrot | $25 | 3 EPS |
+| T3 | Epic Brainrot | $150 | 10 EPS |
+| T4 | Mythic Brainrot | $800 | 40 EPS |
+| T5 | Legend Brainrot | $3,500 | 120 EPS |
 
-### **Upgrade Strategy:**
-1. **First $100k** → **Delivery Speed Level 2** (2x ALL earnings!)
-2. **Next $200k** → **Delivery Speed Level 3** (3x earnings)
-3. **Keep buying T3-T4** until you can afford T5
-4. **Late game** → Max Delivery Speed (7x) then Claim Multiplier (2.5x)
+### **Upgrade Tiers:**
+
+**Claim Multiplier** (Multiply all claimed earnings):
+- Level 1: Free (1x default)
+- Level 2: $50,000 (1.25x)
+- Level 3: $100,000 (1.5x)
+- Level 4: $200,000 (1.75x)
+- Level 5: $300,000 (2x)
+- Level 6: $500,000 (2.5x MAX)
+
+**Delivery Speed** (Increase earning speed):
+- Level 1: Free (1x default)
+- Level 2: $100,000 (2x)
+- Level 3: $150,000 (3x)
+- Level 4: $250,000 (4x)
+- Level 5: $400,000 (5x)
+- Level 6: $600,000 (7x MAX)
+
+### **Recommended Strategy:**
+1. Start with **free T1 character** (Tiny Brainrot)
+2. Buy **T2 ($25)** and **T3 ($150)** characters first
+3. Save for **Delivery Speed Level 2** ($100k) - doubles all earnings!
+4. Buy more **T4 characters** ($800 each)
+5. Keep upgrading **Delivery Speed** for massive income boosts
+6. Late game: Max everything and collect **T5 Legend Brainrots**
 
 ### **Offline Earnings:**
 - Earn **50%** of potential earnings while offline (max 12 hours)
@@ -129,32 +173,41 @@ Your code is ready, but you need to create the 3D world:
 
 ## 🛠️ Troubleshooting
 
-### **Template file missing?**
-If you don't see `BrainrotGame-Template.rbxlx`:
-1. The maintainer needs to create it once (instructions in [docs/SETUP_TEMPLATE.md](docs/SETUP_TEMPLATE.md))
-2. Or use the legacy build: `rojo build -o BrainrotGame.rbxl` (requires manual setup)
+### **"aftman --version" or "rojo --version" not working?**
+- Make sure you **closed all terminals** after editing PATH
+- Restart VS Code completely
+- Verify PATH was added correctly in Environment Variables
+- Check that `C:\aftman` and `C:\rojo` folders exist and contain the executables
+
+### **Rojo won't connect in Studio?**
+- Make sure `rojo serve` is **running** in VS Code terminal (you should see "Rojo server listening...")
+- Check that Rojo plugin is **installed** in Studio (**Plugins → Manage Plugins**)
+- Try port 34872 is not blocked by firewall
+- Close Studio and VS Code, then restart both
 
 ### **Characters don't spawn?**
 - Check **Output window** (View → Output) for errors
-- Verify template file has **ShopLane → LanePath** in workspace
+- Make sure you're standing **inside the green PurchaseZone**
+- Verify you have enough money to buy the character
 
 ### **Can't buy characters?**
 - Stand **inside the green PurchaseZone** (the green transparent platform)
 - Make sure you have **enough money**
-- Click **directly on the character** (colored cube)
+- Click **directly on the character** (colored cube moving in shop lane)
 
 ### **UI doesn't show?**
-- Template should have everything ready
 - Press **Shift+F5** to stop, then **F5** to restart
+- Check that `BrainrotGame-Template.rbxl` was opened correctly
+- Verify `MainHUD` exists in **StarterGui** in the Explorer
 
-### **"Rojo command not found" (for developers)?**
-```powershell
-# Reinstall tools:
-aftman install
-```
+### **Data not saving?**
+- Data only saves in **published games** or **Local Server** test mode
+- In Studio single-player mode, data won't persist (this is normal)
 
-### **Need to modify workspace/UI?**
-See [docs/WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md) for detailed manual setup instructions.
+### **Git clone fails?**
+- Verify Git is installed: `git --version`
+- Check your internet connection
+- Make sure the GitHub URL is correct
 
 ---
 
@@ -162,160 +215,68 @@ See [docs/WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md) for detailed manual setup
 
 ```
 BrainrotGame/
-├── BrainrotGame-Template.rbxlx  # ⭐ Pre-built game (just open & play!)
+├── BrainrotGame-Template.rbxl   # ⭐ Pre-built game file (open & play!)
 ├── src/                         # Source code (syncs via Rojo)
 │   ├── MainServer.server.lua    # Server entry point
-│   ├── server/                  # 7 server services
-│   │   ├── CurrencyService.lua
-│   │   ├── UpgradeService.lua
-│   │   ├── SavingService.lua
-│   │   └── ...
-│   ├── client/                  # 2 client scripts
-│   │   ├── UIController.client.lua
-│   │   └── CharacterFilter.client.lua
-│   └── shared/Config/           # 3 config files
-│       ├── CharacterConfig.lua
-│       ├── UpgradeConfig.lua
-│       └── UIConfig.lua
+│   ├── server/                  # Server services (7 files)
+│   │   ├── BasePadService.lua   # Basepad management
+│   │   ├── BaseService.lua      # Earnings system
+│   │   ├── CurrencyService.lua  # Money management
+│   │   ├── PurchaseService.lua  # Purchase validation
+│   │   ├── SavingService.lua    # DataStore + offline earnings
+│   │   ├── ShopLaneService.lua  # Shop spawning
+│   │   └── TutorialService.lua  # Tutorial system
+│   ├── client/                  # Client scripts (2 files)
+│   │   ├── UIController.client.lua       # UI updates
+│   │   └── CharacterFilter.client.lua    # Multiplayer filtering (not implemented yet)
+│   └── shared/Config/           # Configuration (3 files)
+│       ├── CharacterConfig.lua  # Character tiers (5 tiers)
+│       ├── UIConfig.lua         # UI styling
+│       └── UpgradeConfig.lua    # Upgrade levels (2 upgrades)
 ├── docs/                        # Detailed documentation
 ├── default.project.json         # Rojo configuration
-├── aftman.toml                 # Tool versions
-└── README.md                   # This file
+├── aftman.toml                  # Tool versions
+├── selene.toml                  # Linter config
+├── stylua.toml                  # Formatter config
+└── README.md                    # This file
 ```
 
 ---
 
 ## 🎮 Game Features (v1.1)
 
-- ✅ **5-Tier Character System** - $50 starter → $500k legendary
-- ✅ **Upgrade System** - 2.5x claim + 7x speed multipliers
-- ✅ **Offline Earnings** - Earn 50% while away (12hr cap)
-- ✅ **Auto-Save** - DataStore saves every 2 minutes
-- ✅ **Multi-Player** - Separate basepads & money per player
-- ✅ **Character Filtering** - Only see your own characters
-- ✅ **Anti-Exploit** - Server-authoritative, cooldown protection
+- ✅ **5-Tier Character System** - Free starter → $3,500 legendary (Tiny → Legend Brainrot)
+- ✅ **Dual Upgrade System** - Claim Multiplier (2.5x) + Delivery Speed (7x)
+- ✅ **6 Upgrade Levels** - Each upgrade has 6 levels ($0 → $600,000)
+- ✅ **Offline Earnings** - Earn 50% while away (12 hour cap)
+- ✅ **Auto-Save System** - DataStore saves every 2 minutes + on leave
+- ✅ **Multi-Player Ready** - Separate basepads & currency per player
+- ✅ **Weighted Character Spawning** - Rare characters spawn less often
+- ✅ **Anti-Exploit Protection** - Server-authoritative, 0.3s cooldown
 - ✅ **Tutorial System** - Automatic for new players
+- ✅ **Config-Driven Design** - Easy to add new characters/upgrades
 
 ---
 
 ## 🚀 Publishing to Roblox
 
-1. Open `BrainrotGame-Template.rbxlx` in Studio
-2. **File** → **Publish to Roblox**
-3. Choose **Create New Game** or update existing
-4. Fill in details and publish
-5. Share the game link!
+Want to publish your game to Roblox?
+
+1. In Roblox Studio, click **File** → **Publish to Roblox**
+2. Choose **Create New Game** or update existing game
+3. Add game name, description, and icon
+4. Click **Publish**
+5. Share your game link with friends!
 
 ---
 
 ## 📚 Additional Documentation
 
-See [docs/](docs/) folder for:
+See [docs/](docs/) folder for detailed information:
 - **[PROJECT_HANDOVER.md](docs/PROJECT_HANDOVER.md)** - Complete technical overview
 - **[FEATURES_LIST.md](docs/FEATURES_LIST.md)** - All 12 features explained
-- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Service APIs
+- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - Service APIs & functions
 - **[TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Testing procedures
-- **[WORKSPACE_SETUP.md](docs/WORKSPACE_SETUP.md)** - Manual setup (if needed)
-
----
-
-### **UI doesn't show?**
-- Verify **MainHUD** exists in **StarterGui**
-- Check all UI elements created correctly
-- Press **Shift+F5** to stop, then **F5** to restart
-
-### **"Rojo command not found"?**
-```powershell
-# Reinstall Aftman and tools:
-aftman install
-```
-
-### **Data not saving in Studio?**
-- Use **"Local Server"** test mode (not single player)
-- Or publish to Roblox and test there
-
----
-
-## 📁 Project Structure
-
-```
-BrainrotGame/
-├── src/
-│   ├── MainServer.server.lua           # Server entry point
-│   ├── server/                         # Server services (7 files)
-│   │   ├── CurrencyService.lua         # Money management
-│   │   ├── UpgradeService.lua          # Upgrade system ⭐
-│   │   ├── SavingService.lua           # DataStore + offline earnings
-│   │   ├── BaseService.lua             # Earnings system
-│   │   ├── PurchaseService.lua         # Purchase validation
-│   │   ├── ShopLaneService.lua         # Shop spawning
-│   │   └── TutorialService.lua         # Tutorial system
-│   ├── client/                         # Client scripts (2 files)
-│   │   ├── UIController.client.lua     # UI updates
-│   │   └── CharacterFilter.client.lua  # Multiplayer filtering
-│   └── shared/Config/                  # Configuration (3 files)
-│       ├── CharacterConfig.lua         # Character tiers
-│       ├── UpgradeConfig.lua           # Upgrade levels
-│       └── UIConfig.lua                # UI styling
-├── default.project.json                # Rojo configuration
-├── aftman.toml                         # Tool versions
-├── build.bat                           # Build script (Windows)
-├── start.bat                           # Development server script
-├── README.md                           # This file
-└── docs/                               # Detailed documentation
-    ├── PROJECT_HANDOVER.md             # Technical handover
-    ├── API_REFERENCE.md                # Service APIs
-    ├── FEATURES_LIST.md                # Complete feature list
-    └── TESTING_GUIDE.md                # Testing procedures
-```
-
----
-
-## 📚 Detailed Documentation
-
-For in-depth information, see the [docs/](docs/) folder:
-
-- **[PROJECT_HANDOVER.md](docs/PROJECT_HANDOVER.md)** - Complete technical overview
-- **[FEATURES_LIST.md](docs/FEATURES_LIST.md)** - All 12 features explained
-- **[API_REFERENCE.md](docs/API_REFERENCE.md)** - All service APIs
-- **[TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - How to test systems
-- **[CHANGELOG_v1.1.md](docs/CHANGELOG_v1.1.md)** - Version history
-
----
-
-## 🎮 Game Features (v1.1)
-
-- ✅ **5-Tier Character System** - Free starter → $500k legendary
-- ✅ **Upgrade System** - 2.5x claim multiplier + 7x speed multiplier
-- ✅ **Offline Earnings** - Earn 50% while away (12hr cap)
-- ✅ **Auto-Save** - DataStore saves every 2 minutes
-- ✅ **Multi-Player** - Each player has separate basepads and money
-- ✅ **Character Filtering** - Only see your own characters
-- ✅ **Anti-Exploit** - Server-authoritative, 0.3s purchase cooldown
-- ✅ **Tutorial System** - Automatic for new players
-- ✅ **Toast Notifications** - Purchase feedback
-
----
-
-## 🔧 Development Commands
-
-```powershell
-# Start development server (live sync):
-rojo serve
-
-# Build place file:
-rojo build -o BrainrotGame.rbxl
-
-# Format code:
-stylua src/
-
-# Lint code:
-selene src/
-```
-
----
-
-## 🚀 Publishing to Roblox
 ---
 
 ## 📞 Support
