@@ -2,9 +2,10 @@
 ## BrainrotGame - Final Deliverables Package
 
 **Project:** BrainrotGame (Idle Clicker/Tycoon Game)  
-**Handover Date:** February 17, 2026  
+**Handover Date:** February 19, 2026  
 **Development Framework:** Rojo + Roblox Studio  
-**Status:** ✅ All Core Requirements Met
+**Version:** 1.1 (Enhanced with Upgrades + Offline Earnings)  
+**Status:** ✅ All Core Requirements Met + Bonus Features
 
 ---
 
@@ -85,15 +86,34 @@ ShopLaneService.SpawnRandomCharacter()
 -- API Methods:
 SavingService.LoadPlayerData(player) --> data table
 SavingService.SavePlayerData(player) --> boolean
+SavingService.CalculateOfflineEarnings(player, savedData) --> number
 ```
 - Auto-saves every 2 minutes
 - Retry logic (3 attempts with delay)
-- Saves: Balance, Unclaimed, Earners list
+- Saves: Balance, Unclaimed, Earners, Upgrades, LastLogout
+- **Offline Earnings**: Calculates 50% of earnings while away (12hr cap)
 - DataStore key: `PlayerData_v1`
+
+#### **UpgradeService.lua** - 🆕 Upgrade System
+```lua
+-- API Methods:
+UpgradeService.InitPlayer(player, savedUpgrades)
+UpgradeService.HandleUpgradeRequest(player, upgradeId)
+UpgradeService.GetClaimMultiplier(player) --> number
+UpgradeService.GetDeliveryMultiplier(player) --> number
+```
+- **Claim Multiplier**: 6 levels (1x to 2.5x bonus on claims)
+- **Delivery Speed**: 6 levels (1x to 7x earning rate)
+- Server-validated purchases
+- Permanent upgrades (saved to DataStore)
 
 ---
 
 ### ✅ 3. Client UI (Reads Server State, Sends Requests)
+
+**Files:**
+- [src/client/UIController.client.lua](src/client/UIController.client.lua) - UI updates
+- [src/client/CharacterFilter.client.lua](src/client/CharacterFilter.client.lua) - 🆕 Hide other players' characters
 
 **File:** [src/client/UIController.client.lua](src/client/UIController.client.lua)
 
@@ -161,25 +181,141 @@ Server updates money → RemoteEvent:StateUpdate(balance, unclaimed) → Client 
 - Manual save on **PlayerRemoving** event
 - Retry logic: 3 attempts with 0.5s delay
 
-**What Gets Saved:**
+**What Gets Saved (v1.1):**
 ```lua
 {
-    Balance = 1000,         -- Spendable money
-    Unclaimed = 250,        -- Money waiting to be claimed
-    Earners = {             -- Array of owned characters
-        {characterId = 1, BasePadRef = "T1"},
-        {characterId = 2, BasePadRef = "T2"}
+    Balance = 1000,             -- Spendable money
+    Unclaimed = 250,            -- Money waiting to be claimed
+    Earners = {                 -- Array of owned characters
+        {id = 1, eps = 1},
+        {id = 3, eps = 10}
+    },
+    Upgrades = {                -- 🆕 Upgrade levels
+        ClaimMultiplier = 2,    -- Level 2 (1.25x)
+        DeliverySpeed = 3       -- Level 3 (3x)
     },
     HasSeenTutorial = true,
-    LastSave = 1234567890   -- Unix timestamp
+    LastSave = 1708392847,      -- Unix timestamp
+    LastLogout = 1708392847     -- 🆕 For offline earnings
 }
 ```
+
+**🆕 v1.1 Improvements:**
+- Saves upgrade levels (persistent across sessions)
+- Tracks LastLogout for offline earnings calculation
+- Stores EPS values with earners (needed for offline calc)
 
 **Testing Results:** See [TESTING_GUIDE.md](TESTING_GUIDE.md) for full test cases.
 
 ---
 
-## 🏗️ SETUP INSTRUCTIONS FOR NEW DEVELOPER
+## � NEW FEATURES (v1.1)
+
+### 1. **Upgrade System**
+Two permanent upgrade types with 6 levels each:
+
+#### 💰 Claim Multiplier
+- Multiplies money when claiming
+- Level 1: 1x (free, default)
+- Level 6: 2.5x (+150% bonus) - $500,000
+- **Example:** Claim $1000 with Level 3 → Get $1500
+
+#### ⚡ Delivery Speed  
+- Multiplies earning rate for ALL characters
+- Level 1: 1x (free, default)
+- Level 6: 7x (+600% faster) - $600,000
+- **Example:** 100 EPS with Level 4 → Earn 400 per second
+
+**Config File:** [src/shared/Config/UpgradeConfig.lua](src/shared/Config/UpgradeConfig.lua)
+
+---
+
+### 2. **Offline Earnings**
+Players earn money while away from the game!
+
+**How It Works:**
+- Saves `LastLogout` timestamp on disconnect
+- On rejoin, calculates time away
+- Awards **50%** of potential earnings
+- **Capped at 12 hours** maximum
+- **Minimum 10 seconds** away required
+
+**Formula:**
+```
+(Base EPS × Delivery Multiplier × Seconds Away) × 50%
+```
+
+**Example:**
+- Player has 100 EPS, Delivery Speed Level 4 (4x) = 400 actual EPS
+- Offline for 2 hours (7,200 seconds)
+- Potential: 400 × 7,200 = 2,880,000
+- Award: 2,880,000 × 50% = **1,440,000 added to Unclaimed**
+
+**Why 50%?** Prevents AFK farming while still rewarding returning players.
+
+---
+
+### 3. **Character Filtering (Client-Side)**
+Each player only sees their own basepad characters!
+
+**Benefits:**
+- Reduces visual clutter in crowded servers
+- Prevents confusion ("Whose character is that?")
+- Better performance (fewer rendered models)
+- Cleaner screenshots/videos
+
+**Implementation:** [src/client/CharacterFilter.client.lua](src/client/CharacterFilter.client.lua)
+- Uses `LocalTransparencyModifier` (efficient)
+- Hides other players' nameplates
+- Runs entirely on client
+
+---
+
+### 4. **Enhanced Model System**
+Characters now load from ReplicatedStorage templates:
+
+**Structure:**
+```
+ReplicatedStorage
+└── CharacterModels
+    ├── Brainrot_T1 (Model - Tier 1 template)
+    ├── Brainrot_T2 (Model - Tier 2 template)
+    ├── Brainrot_T3 (Model - Tier 3 template)
+    ├── Brainrot_T4 (Model - Tier 4 template)
+    └── Brainrot_T5 (Model - Tier 5 template)
+```
+
+**Features:**
+- Humanoid models with animations
+- Color-coded by tier
+- Smooth transitions from shop to basepad
+- Owner identification values
+- Nametags with EPS display
+
+---
+
+## 📊 FEATURE COMPARISON
+
+| Feature | v1.0 | v1.1 |
+|---------|------|------|
+| Character Tiers | ✅ 5 | ✅ 5 |
+| Purchase System | ✅ | ✅ |
+| Earnings System | ✅ | ✅ Enhanced |
+| DataStore Saving | ✅ Basic | ✅ Extended |
+| Multi-player | ✅ | ✅ Enhanced |
+| **Upgrade System** | ❌ | ✅ **NEW** |
+| **Offline Earnings** | ❌ | ✅ **NEW** |
+| **Character Filtering** | ❌ | ✅ **NEW** |
+| **Model Templates** | ❌ | ✅ **NEW** |
+| Services | 6 | 7 (+UpgradeService) |
+| Config Files | 2 | 3 (+UpgradeConfig) |
+| RemoteEvents | 5 | 7 (+UpgradeUpdate, RequestUpgrade) |
+
+**📈 Code Growth:** +500 lines, maintains clean architecture
+
+---
+
+## �🏗️ SETUP INSTRUCTIONS FOR NEW DEVELOPER
 
 ### Prerequisites
 1. **Roblox Studio** (latest version)
