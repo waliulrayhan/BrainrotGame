@@ -1,85 +1,71 @@
-# 📚 Documentation
+# Documentation
 
-Detailed documentation for BrainrotGame.
-
----
-
-## � FOR MAINTAINERS
-
-**Creating the Pre-Built Template:**
-- **[CREATE_TEMPLATE_NOW.md](CREATE_TEMPLATE_NOW.md)** - ⚠️ Action required! Create template for zero-setup
-- **[SETUP_TEMPLATE.md](SETUP_TEMPLATE.md)** - Step-by-step template creation guide
+Clean and simple documentation for BrainrotGame.
 
 ---
 
-## �📖 Quick Reference
+## Documentation Files
 
-### Setup & Getting Started
-- **[QUICKSTART.md](QUICKSTART.md)** - 3-step quick setup guide
-- **[WORKSPACE_SETUP.md](WORKSPACE_SETUP.md)** - Detailed 3D world setup
-- **[ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)** - Optional environment decoration guide
-- **[TUTORIAL_SETUP_GUIDE.md](TUTORIAL_SETUP_GUIDE.md)** - In-game tutorial system
+### [BACKEND_API.md](BACKEND_API.md)
+**Complete backend reference for developers**
 
-### Technical Documentation
-- **[PROJECT_HANDOVER.md](PROJECT_HANDOVER.md)** - Complete technical overview (620 lines)
-- **[API_REFERENCE.md](API_REFERENCE.md)** - All service APIs and methods
-- **[FEATURES_LIST.md](FEATURES_LIST.md)** - All 12 features explained in detail
-- **[CHANGELOG_v1.1.md](CHANGELOG_v1.1.md)** - Version history and changes
+Contains:
+- All 8 server services (Currency, Purchase, Base, BasePad, ShopLane, Saving, Upgrade, Tutorial)
+- Complete API methods with parameters and return types
+- Architecture overview and data flows
+- Testing procedures and anti-exploit strategies
+- Remote Events documentation
+- Configuration files (CharacterConfig, UpgradeConfig)
 
-### Testing & Quality
-- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - How to test all systems
-- **[HANDOVER_CHECKLIST.md](HANDOVER_CHECKLIST.md)** - Pre-delivery checklist
-- **[COMPLIANCE.md](COMPLIANCE.md)** - Requirements compliance report
-
-### Delivery & Publishing
-- **[DUAL_DELIVERY_GUIDE.md](DUAL_DELIVERY_GUIDE.md)** - GitHub + Roblox delivery strategy
-- **[GITHUB_DELIVERY_GUIDE.md](GITHUB_DELIVERY_GUIDE.md)** - Detailed GitHub publishing guide
-
-### Customization
-- **[UI_COLOR_UPDATE_GUIDE.md](UI_COLOR_UPDATE_GUIDE.md)** - How to customize UI colors
-- **[PROJECT_UPDATE.md](PROJECT_UPDATE.md)** - Migration guide for v1.1 changes
+**Use this when:**
+- Writing server-side code
+- Debugging gameplay logic
+- Adding new features
+- Understanding how services communicate
 
 ---
 
-## 🎯 Where to Start?
+### [UI_DESIGN.md](UI_DESIGN.md)
+**Complete UI and workspace setup guide**
 
-**New Developer?**
-1. Start with main **[README.md](../README.md)** (in parent folder)
-2. Then read **[QUICKSTART.md](QUICKSTART.md)** for setup
-3. Review **[PROJECT_HANDOVER.md](PROJECT_HANDOVER.md)** for architecture
+Contains:
+- Workspace structure (BasePads, ShopLane, PurchaseZone)
+- Complete color palette (16 colors defined)
+- UI component styling (TopBar, BalanceContainer, ClaimButton)
+- Step-by-step setup instructions
+- Character billboard styling
+- Design tips and best practices
 
-**Testing?**
-1. **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Test procedures
-2. **[HANDOVER_CHECKLIST.md](HANDOVER_CHECKLIST.md)** - Verification checklist
-
-**Publishing?**
-1. **[DUAL_DELIVERY_GUIDE.md](DUAL_DELIVERY_GUIDE.md)** - Best practices
-2. **[GITHUB_DELIVERY_GUIDE.md](GITHUB_DELIVERY_GUIDE.md)** - GitHub workflow
-
----
-
-## 📁 Documentation Map
-
-```
-docs/
-├── QUICKSTART.md               # Fast 3-step setup
-├── PROJECT_HANDOVER.md         # Master technical guide ⭐
-├── FEATURES_LIST.md            # All 12 features detailed
-├── API_REFERENCE.md            # Service APIs
-├── TESTING_GUIDE.md            # Testing procedures
-├── CHANGELOG_v1.1.md           # Version history
-├── WORKSPACE_SETUP.md          # 3D world setup
-├── ENVIRONMENT_SETUP.md        # Optional decorations
-├── TUTORIAL_SETUP_GUIDE.md     # Tutorial system
-├── UI_COLOR_UPDATE_GUIDE.md    # Color customization
-├── DUAL_DELIVERY_GUIDE.md      # Delivery strategy
-├── GITHUB_DELIVERY_GUIDE.md    # GitHub publishing
-├── HANDOVER_CHECKLIST.md       # Pre-delivery checks
-├── COMPLIANCE.md               # Requirements met
-└── PROJECT_UPDATE.md           # v1.1 migration guide
-```
+**Use this when:**
+- Setting up the game world
+- Customizing UI colors
+- Creating new UI elements
+- Understanding workspace structure
 
 ---
 
-**Total Documentation:** 15 files | ~6,000+ lines  
-**Last Updated:** February 20, 2026
+## Quick Start
+
+**New to the project?**
+1. Start with main [README.md](../README.md) (in parent folder)
+2. Read [BACKEND_API.md](BACKEND_API.md) for server logic
+3. Read [UI_DESIGN.md](UI_DESIGN.md) for UI/workspace setup
+
+**Need to modify the game?**
+- **Backend changes** → [BACKEND_API.md](BACKEND_API.md)
+- **UI/Workspace changes** → [UI_DESIGN.md](UI_DESIGN.md)
+- **Character/Upgrade config** → See [BACKEND_API.md](BACKEND_API.md) "Config Files" section
+
+---
+
+## Documentation Philosophy
+
+This documentation follows a **"2-file rule"**:
+- Everything backend-related in ONE file
+- Everything frontend-related in ONE file
+- No redundancy, no scattered information
+- Easy to search, easy to maintain
+
+---
+
+**Version:** 1.1 | **Last Updated:** February 20, 2026

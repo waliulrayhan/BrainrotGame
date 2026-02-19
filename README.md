@@ -6,6 +6,14 @@ An idle/tycoon game where you buy characters, place them on your basepad, and ea
 
 ---
 
+## Play Now (Live)
+
+**Want to try the game first?** Play it live on Roblox:
+
+**[Play BrainrotGame on Roblox](https://www.roblox.com/games/126705578084525/BrainrotGame)**
+
+---
+
 ## What You Get
 
 - **5-Tier Character System** - Buy characters from $0 (free starter) → $3,500
@@ -100,7 +108,16 @@ Download and install these in order:
 5. Click **"Install"** on the official Rojo plugin
 6. Close the plugins window
 
-### **Step 8: Connect VS Code to Roblox Studio**
+### **Step 8: Install VS Code Extensions (Recommended)**
+
+For better development experience, install these extensions:
+
+1. In **VS Code**, press **Ctrl + Shift + X** (Extensions)
+2. Search and install:
+   - **Luau LSP** (by JohnnyMorganz) - Luau language support
+   - **Rojo - VS Code** (by evaera) - Rojo integration
+
+### **Step 9: Connect VS Code to Roblox Studio**
 
 1. In **VS Code**, open a new terminal (**Ctrl + `**)
 2. Run this command:
@@ -113,7 +130,7 @@ Download and install these in order:
 5. Click **"Connect"** in the Rojo popup
 6. Wait for "Connected successfully!" message
 
-### **Step 9: Play the Game!**
+### **Step 10: Play the Game!**
 
 1. In Roblox Studio, press **F5**
 2. **Boom! Enjoy the game!**

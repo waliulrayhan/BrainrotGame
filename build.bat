@@ -75,12 +75,13 @@ echo File location: %CD%\BrainrotGame.rbxl
 echo.
 echo NEXT STEPS:
 echo  1. Open BrainrotGame.rbxl in Roblox Studio
-echo  2. Build the 3D world (see WORKSPACE_SETUP.md^)
-echo  3. Create the UI (see README.md^)
+echo  2. Build the 3D world (see docs\UI_DESIGN.md^)
+echo  3. Create the UI (see docs\UI_DESIGN.md^)
 echo  4. Press F5 to test!
 echo.
-echo For complete handover instructions, see:
-echo  - PROJECT_HANDOVER.md
-echo  - HANDOVER_CHECKLIST.md
+echo For complete documentation, see:
+echo  - README.md (Setup guide^)
+echo  - docs\BACKEND_API.md (Server logic^)
+echo  - docs\UI_DESIGN.md (Workspace and UI^)
 echo.
 pause

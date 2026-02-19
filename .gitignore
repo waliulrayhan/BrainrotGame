@@ -1,10 +1,4 @@
-﻿# Roblox
-*.rbxl
-*.rbxlx
-*.rbxm
-*.rbxmx
-
-# Rojo
+﻿# Rojo
 build/
 
 # Wally
