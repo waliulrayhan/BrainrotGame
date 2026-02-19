@@ -437,7 +437,7 @@ After setting up:
 
 ---
 
-## 📐 Advanced Customization
+## Advanced Customization
 
 ### Custom Fonts
 Replace `GothamBold` with any Roblox font:
@@ -468,7 +468,7 @@ end)
 
 ---
 
-## ✨ Final Result
+## Final Result
 
 Your game will have:
 - Professional blue-gray color scheme
